@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"embed"
 	"fmt"
 	"path/filepath"
 
@@ -14,6 +15,7 @@ type AppCmd interface {
 }
 
 type appCmd struct {
+    templatesFS embed.FS
     project models.Project
 }
 
@@ -28,6 +30,8 @@ func (cmd *appCmd) CreateApp() error {
     
     cmd.write("templates/env.sample.tpl", appPath+"/.env", cmd.project)
     cmd.write("templates/env.sample.tpl", appPath+"/.env.sample", cmd.project)
+    cmd.write("templates/gitignore.tpl", appPath+"/.gitignore", cmd.project)
+    cmd.write("templates/Makefile.tpl", appPath+"/Makefile", cmd.project)
     cmd.write("templates/go.tpl", appPath+"/go.mod", cmd.project)
     cmd.write("templates/main.tpl", appPath+"/main.go", cmd.project)
     
@@ -46,10 +50,13 @@ func (cmd *appCmd) CreateApp() error {
 func (cmd *appCmd) write(templatePath string, outputPath string, data interface{}) error {
     baseDir := filepath.Dir(outputPath)
     utils.CreateDirectory(baseDir)
-    tpl, _ := utils.GenerateCode(templatePath, data)
+    tpl, _ := utils.GenerateCode(cmd.templatesFS, templatePath, data)
     return utils.WriteFile(outputPath, tpl)
 }
 
-func NewAppCmd(project models.Project) AppCmd {
-    return &appCmd{project: project}
+func NewAppCmd(tpl embed.FS, project models.Project) AppCmd {
+    return &appCmd{
+        templatesFS: tpl,
+        project: project,
+    }
 }

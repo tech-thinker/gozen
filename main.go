@@ -1,12 +1,16 @@
 package main
 
 import (
+	"embed"
 	"os"
 
 	"github.com/tech-thinker/gozen/cmd"
 	"github.com/tech-thinker/gozen/models"
 	"github.com/urfave/cli/v2"
 )
+
+//go:embed templates/*
+var templatesFS embed.FS
 
 func main() {
 	var packageName string
@@ -39,7 +43,7 @@ func main() {
                     AppName: ctx.Args().Get(0),
                     PackageName:     packageName,
                 }
-                app := cmd.NewAppCmd(project)
+                app := cmd.NewAppCmd(templatesFS, project)
 
 				return app.CreateApp()
 			},

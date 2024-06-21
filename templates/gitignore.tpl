@@ -1,0 +1,3 @@
+{{.AppName}}
+.env
+.db

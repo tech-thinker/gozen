@@ -2,14 +2,15 @@ package utils
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"html/template"
 	"os"
 )
 
 
-func GenerateCode(tplFile string, data interface{}) (string, error) {
-	tpl, err := template.ParseFiles(tplFile)
+func GenerateCode(tplFS embed.FS, tplFile string, data interface{}) (string, error) {
+	tpl, err := template.ParseFS(tplFS, tplFile)
 	if err != nil {
 		return "", err
 	}
