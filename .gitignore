@@ -5,7 +5,11 @@
 *.so
 *.dylib
 gozen
+gozen-*
 
 # Test binary, built with `go test -c`
 *.test
 *.out
+
+# Directory
+build/
