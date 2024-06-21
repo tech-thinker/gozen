@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"embed"
 	"fmt"
-	"path/filepath"
 
+	"github.com/tech-thinker/gozen/cmd/helper"
 	"github.com/tech-thinker/gozen/constants"
 	"github.com/tech-thinker/gozen/models"
 	"github.com/tech-thinker/gozen/utils"
@@ -15,8 +14,8 @@ type AppCmd interface {
 }
 
 type appCmd struct {
-    templatesFS embed.FS
     project models.Project
+    helper helper.CommonHelper
 }
 
 func (cmd *appCmd) CreateApp() error {
@@ -28,35 +27,30 @@ func (cmd *appCmd) CreateApp() error {
         return err
     }
     
-    cmd.write("templates/env.sample.tpl", appPath+"/.env", cmd.project)
-    cmd.write("templates/env.sample.tpl", appPath+"/.env.sample", cmd.project)
-    cmd.write("templates/gitignore.tpl", appPath+"/.gitignore", cmd.project)
-    cmd.write("templates/Makefile.tpl", appPath+"/Makefile", cmd.project)
-    cmd.write("templates/go.tpl", appPath+"/go.mod", cmd.project)
-    cmd.write("templates/main.tpl", appPath+"/main.go", cmd.project)
+    // Generating basic codes
+    cmd.helper.Write("templates/env.sample.tpl", appPath+"/.env", cmd.project)
+    cmd.helper.Write("templates/env.sample.tpl", appPath+"/.env.sample", cmd.project)
+    cmd.helper.Write("templates/gitignore.tpl", appPath+"/.gitignore", cmd.project)
+    cmd.helper.Write("templates/Makefile.tpl", appPath+"/Makefile", cmd.project)
+    cmd.helper.Write("templates/go.tpl", appPath+"/go.mod", cmd.project)
+    cmd.helper.Write("templates/main.tpl", appPath+"/main.go", cmd.project)
     
-    cmd.write("templates/config/config.tpl", appPath+"/config/config.go", cmd.project)
-    cmd.write("templates/constants/app.tpl", appPath+"/constants/app.go", cmd.project)
-    cmd.write("templates/instance/instance.tpl", appPath+"/instance/instance.go", cmd.project)
-    cmd.write("templates/logger/logger.tpl", appPath+"/logger/logger.go", cmd.project)
-    cmd.write("templates/models/model_registry.tpl", appPath+"/models/model_registry.go", cmd.project)
-    cmd.write("templates/utils/utils.tpl", appPath+"/utils/utils.go", cmd.project)
+    cmd.helper.Write("templates/config/config.tpl", appPath+"/config/config.go", cmd.project)
+    cmd.helper.Write("templates/constants/app.tpl", appPath+"/constants/app.go", cmd.project)
+    cmd.helper.Write("templates/instance/instance.tpl", appPath+"/instance/instance.go", cmd.project)
+    cmd.helper.Write("templates/logger/logger.tpl", appPath+"/logger/logger.go", cmd.project)
+    cmd.helper.Write("templates/models/model_registry.tpl", appPath+"/models/model_registry.go", cmd.project)
+    cmd.helper.Write("templates/utils/utils.tpl", appPath+"/utils/utils.go", cmd.project)
     
-
-
 	return nil
 }
 
-func (cmd *appCmd) write(templatePath string, outputPath string, data interface{}) error {
-    baseDir := filepath.Dir(outputPath)
-    utils.CreateDirectory(baseDir)
-    tpl, _ := utils.GenerateCode(cmd.templatesFS, templatePath, data)
-    return utils.WriteFile(outputPath, tpl)
-}
-
-func NewAppCmd(tpl embed.FS, project models.Project) AppCmd {
+func NewAppCmd(
+    project models.Project,
+    helper helper.CommonHelper,
+) AppCmd {
     return &appCmd{
-        templatesFS: tpl,
         project: project,
+        helper: helper,
     }
 }

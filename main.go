@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/tech-thinker/gozen/cmd"
+	"github.com/tech-thinker/gozen/cmd/helper"
 	"github.com/tech-thinker/gozen/models"
 	"github.com/urfave/cli/v2"
 )
@@ -13,8 +14,12 @@ import (
 var templatesFS embed.FS
 
 func main() {
+    // Declaring flags
 	var packageName string
 	var outputDir string
+    
+    // Initialize common helper
+    helper := helper.NewCommonHelper(templatesFS)
 
 	clientApp := cli.NewApp()
 	clientApp.Name = "gozen"
@@ -43,7 +48,7 @@ func main() {
                     AppName: ctx.Args().Get(0),
                     PackageName:     packageName,
                 }
-                app := cmd.NewAppCmd(templatesFS, project)
+                app := cmd.NewAppCmd(project, helper)
 
 				return app.CreateApp()
 			},
