@@ -44,6 +44,7 @@ func (cmd *appCmd) CreateApp() error {
 	cmd.helper.Write("templates/logger/logger.tpl", appPath+"/logger/logger.go", cmd.project)
 	cmd.helper.Write("templates/models/model_registry.tpl", appPath+"/models/model_registry.go", cmd.project)
 	cmd.helper.Write("templates/models/health.tpl", appPath+"/models/health.go", cmd.project)
+	cmd.helper.Write("templates/instance/registry/models.tpl", appPath+"/instance/registry/models.go", cmd.project)
 	cmd.helper.Write("templates/repository/health.tpl", appPath+"/repository/health.go", cmd.project)
 	cmd.helper.Write("templates/runner/api.tpl", appPath+"/runner/api.go", cmd.project)
 	cmd.helper.Write("templates/service/health.tpl", appPath+"/service/health.go", cmd.project)
