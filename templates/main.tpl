@@ -26,7 +26,12 @@ func main() {
 			Name:  "start",
 			Usage: "Start the service",
 			Action: func(c *cli.Context) error {
-				
+				var wg sync.WaitGroup
+
+				wg.Add(1)
+				go runner.NewAPI(cfg, instance).Go(context.Background(), &wg)
+
+				wg.Wait()
 				return nil
 			},
 		},

@@ -17,3 +17,7 @@ build-all:
 	GOOS=darwin GOARCH=arm64 go build -o build/gozen-darwin-arm64
 	GOOS=windows GOARCH=amd64 go build -o build/gozen-windows-amd64.exe
 	GOOS=windows GOARCH=386 go build -o build/gozen-windows-i386.exe
+
+clean:
+	rm -rf gozen*
+	rm -rf build

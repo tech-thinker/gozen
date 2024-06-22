@@ -3,12 +3,12 @@ module {{.PackageName}}
 go 1.22
 
 require (
+    github.com/gin-gonic/gin v1.10.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.7.1
 	github.com/urfave/cli/v2 v2.27.2
+	gorm.io/driver/sqlite v1.5.5
+	gorm.io/gorm v1.25.10
 )
 
-require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
-)
+require ()

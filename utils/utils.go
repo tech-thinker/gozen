@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"strings"
 )
 
 
@@ -24,6 +25,11 @@ func GenerateCode(tplFS embed.FS, tplFile string, data interface{}) (string, err
 }
 
 func WriteFile(path, data string) error {
+    // Replacing escape characters
+    data = strings.ReplaceAll(data, "&lt;", "<")
+    data = strings.ReplaceAll(data, "&gt;", ">")
+    data = strings.ReplaceAll(data, "&amp;", "&")
+
 	file, err := os.Create(path)
 	if err != nil {
 		return err

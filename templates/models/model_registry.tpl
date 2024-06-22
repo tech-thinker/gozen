@@ -8,7 +8,7 @@ import (
 
 func RegisterModels(db *gorm.DB) {
 	// Automigrate the models
-	if err := migrate(db, &User{}); err != nil {
+	if err := migrate(db, &Health{}); err != nil {
 		log.Fatal("failed to automigrate models:", err)
 	}
 }
