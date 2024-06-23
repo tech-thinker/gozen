@@ -1,4 +1,9 @@
 VERSION=1.0.0
 APP_NAME={{.AppName}}
 API_PORT=3000
-DATABASE_NAME={{.AppName}}.db
+DB_DRIVER={{.Driver}}
+DB_NAME={{.AppName}}{{- if eq .Driver "sqlite"}}.db{{- end}}
+DB_HOST=127.0.0.1
+DB_PORT={{- if eq .Driver "sqlite"}}0{{- else if eq .Driver "mysql"}}3306{{- else if eq .Driver "postgres"}}5432{{- end}}
+DB_USER=test
+DB_PASS=test

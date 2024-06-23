@@ -14,12 +14,13 @@ import (
 var templatesFS embed.FS
 
 func main() {
-    // Declaring flags
+	// Declaring flags
 	var packageName string
 	var outputDir string
-    
-    // Initialize common helper
-    helper := helper.NewCommonHelper(templatesFS)
+	var driver string
+
+	// Initialize common helper
+	helper := helper.NewCommonHelper(templatesFS)
 
 	clientApp := cli.NewApp()
 	clientApp.Name = "gozen"
@@ -36,19 +37,27 @@ func main() {
 					Destination: &packageName,
 				},
 				&cli.StringFlag{
-					Name:        "dir",
-					Aliases:     []string{"d"},
+					Name:        "output",
+					Aliases:     []string{"o"},
 					Value:       ".",
 					Usage:       "Output directory for new project.",
 					Destination: &outputDir,
 				},
+				&cli.StringFlag{
+					Name:        "driver",
+					Aliases:     []string{"d"},
+					Value:       "sqlite",
+					Usage:       "Database driver for new project. eg. [sqlite, mysql, postgres]",
+					Destination: &driver,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-                project := models.Project{
-                    AppName: ctx.Args().Get(0),
-                    PackageName:     packageName,
-                }
-                app := cmd.NewAppCmd(project, helper)
+				project := models.Project{
+					AppName:     ctx.Args().Get(0),
+					PackageName: packageName,
+					Driver:      driver,
+				}
+				app := cmd.NewAppCmd(project, helper)
 
 				return app.CreateApp()
 			},

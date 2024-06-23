@@ -12,6 +12,7 @@ import (
 type Project struct {
 	AppName     string `json:"app_name"`
 	PackageName string `json:"package_name"`
+	Driver      string `json:"driver"`
 }
 
 func (p Project) ToJSON() string {
@@ -28,28 +29,28 @@ func (p *Project) FromJSON(jsonStr string) error {
 
 func (p *Project) LoadFromJsonFile() error {
 	filename := fmt.Sprintf(`%s/gozen.json`, constants.CURRENT_WORKING_DIRECTORY)
-    file, err := os.Open(filename)
-    if err != nil {
-        return err
-    }
-    defer file.Close()
-    bytes, err := io.ReadAll(file)
-    if err != nil {
-        return err
-    }
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	bytes, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
 	return p.FromJSON(string(bytes))
 }
 
 func (p Project) WriteToJsonFile() error {
-    filename := fmt.Sprintf(`%s/%s/gozen.json`, constants.CURRENT_WORKING_DIRECTORY, p.AppName)
-    file, err := os.Create(filename)
-    if err != nil {
-        return err
-    }
-    defer file.Close()
-    _, err = file.WriteString(p.ToJSON())
-    if err != nil {
-        return err
-    }
-    return nil
+	filename := fmt.Sprintf(`%s/%s/gozen.json`, constants.CURRENT_WORKING_DIRECTORY, p.AppName)
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(p.ToJSON())
+	if err != nil {
+		return err
+	}
+	return nil
 }
