@@ -1,11 +1,15 @@
 package instance
 
 import (
+    "fmt"
     "log"
     "gorm.io/driver/sqlite"
+    "gorm.io/driver/mysql"
+    "gorm.io/driver/postgres"
     "gorm.io/gorm"
 
 	"{{.PackageName}}/config"
+	"{{.PackageName}}/constants"
 )
 
 type Instance interface {
@@ -31,7 +35,17 @@ func (instance *instance) DB() *gorm.DB {
 func Init(cfg config.Configuration) Instance {
 	instance := &instance{}
     
-    gormDB, err := gorm.Open(sqlite.Open(cfg.DatabaseName()), &gorm.Config{})
+    var conn gorm.Dialector
+    if cfg.DbDriver() == constants.DbDriverSQLite {
+        conn = sqlite.Open(cfg.DbName())
+    } else if cfg.DbDriver() == constants.DbDriverMySQL {
+        url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", cfg.DbUser(), cfg.DbPass(), cfg.DbHost(), cfg.DbPort(), cfg.DbName())
+        conn = mysql.Open(url)
+    } else if cfg.DbDriver() == constants.DbDriverPostgres {
+        url := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", cfg.DbHost(), cfg.DbUser(), cfg.DbPass(), cfg.DbName(), cfg.DbPort())
+        conn = postgres.Open(url)
+    }
+    gormDB, err := gorm.Open(conn, &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}

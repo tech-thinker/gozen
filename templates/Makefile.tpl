@@ -2,7 +2,9 @@
 include .env
 export $(shell dotenv export)
 
-# Install dependencies
+test:
+    go test -v ./...  -race -coverprofile=coverage.out -covermode=atomic
+
 install:
 	go mod tidy
 
