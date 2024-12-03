@@ -8,21 +8,27 @@ Download and install executable binary from GitHub releases page.
 
 ### Linux Installation
 ```sh
-curl -sL https://github.com/tech-thinker/gozen/releases/download/v1.0.0/gozen-linux-amd64 -o gozen
+curl -sL https://github.com/tech-thinker/gozen/releases/download/v0.1.1/gozen-linux-amd64 -o gozen
 chmod +x gozen
 sudo mv gozen /usr/bin
 ```
 
 ### MacOS Installation
 ```sh
-curl -sL https://github.com/tech-thinker/gozen/releases/download/v1.0.0/gozen-darwin-amd64 -o gozen
+curl -sL https://github.com/tech-thinker/gozen/releases/download/v0.1.1/gozen-darwin-amd64 -o gozen
 chmod +x gozen
 sudo mv gozen /usr/bin
 ```
 
+- Or using homebrew
+```sh
+brew tap tech-thinker/tap
+brew install gozen
+```
+
 ### Windows Installation
 ```sh
-curl -sL https://github.com/tech-thinker/gozen/releases/download/v1.0.0/gozen-windows-amd64.exe -o gozen.exe
+curl -sL https://github.com/tech-thinker/gozen/releases/download/v0.1.1/gozen-windows-amd64.exe -o gozen.exe
 gozen.exe
 ```
 

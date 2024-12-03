@@ -19,7 +19,11 @@ type appCmd struct {
 }
 
 func (cmd *appCmd) CreateApp() error {
-	appPath := fmt.Sprintf(`%s/%s`, constants.CURRENT_WORKING_DIRECTORY, cmd.project.AppName)
+    workDir := constants.CURRENT_WORKING_DIRECTORY
+    if len(cmd.project.WorkingDir) > 1 {
+        workDir = cmd.project.WorkingDir
+    }
+	appPath := fmt.Sprintf(`%s/%s`, workDir, cmd.project.AppName)
 	fmt.Println("Project created at location: " + appPath)
 	utils.CreateDirectory(appPath)
 	// Write project config into file
