@@ -36,19 +36,19 @@ build:
 build-all:
 	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-amd64
 	cp build/gozen-linux-amd64 build/gozen
-	tar -zcvf build/gozen-linux-amd64.tar.gz build/gozen-linux-amd64 man/gozen.1
+	tar -zcvf build/gozen-linux-amd64.tar.gz build/gozen man/gozen.1
 	GOOS=linux GOARCH=arm64 go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-arm64
 	cp build/gozen-linux-arm64 build/gozen
-	tar -zcvf build/gozen-linux-arm64.tar.gz build/gozen-linux-arm64 man/gozen.1
+	tar -zcvf build/gozen-linux-arm64.tar.gz build/gozen man/gozen.1
 	GOOS=linux GOARCH=arm go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-arm
 	cp build/gozen-linux-arm build/gozen
-	tar -zcvf build/gozen-linux-arm.tar.gz build/gozen-linux-arm man/gozen.1
+	tar -zcvf build/gozen-linux-arm.tar.gz build/gozen man/gozen.1
 	GOOS=darwin GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-darwin-amd64
 	cp build/gozen-darwin-amd64 build/gozen
-	tar -zcvf build/gozen-darwin-amd64.tar.gz build/gozen-darwin-amd64 man/gozen.1
+	tar -zcvf build/gozen-darwin-amd64.tar.gz build/gozen man/gozen.1
 	GOOS=darwin GOARCH=arm64 go build -ldflags="$(LDFLAGS)" -o build/gozen-darwin-arm64
 	cp build/gozen-darwin-arm64 build/gozen
-	tar -zcvf build/gozen-darwin-arm64.tar.gz build/gozen-darwin-arm64 man/gozen.1
+	tar -zcvf build/gozen-darwin-arm64.tar.gz build/gozen man/gozen.1
 	rm build/gozen
 	GOOS=windows GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-windows-amd64.exe
 	GOOS=windows GOARCH=386 go build -ldflags="$(LDFLAGS)" -o build/gozen-windows-i386.exe
