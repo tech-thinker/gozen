@@ -1,0 +1,16 @@
+# Builder stage
+FROM golang:1.22 as builder
+
+WORKDIR /src
+ADD . .
+RUN go build -o app .
+
+# Runner Stage
+FROM alpine:edge
+RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache tzdata
+RUN mkdir /app
+WORKDIR /app
+COPY --from=builder /src/app /app/app
+CMD ["/app/app", "start"]
+EXPOSE 3000

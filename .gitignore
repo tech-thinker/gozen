@@ -10,6 +10,8 @@ gozen-*
 # Test binary, built with `go test -c`
 *.test
 *.out
+coverage.out
 
 # Directory
 build/
+coverage/

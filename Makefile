@@ -12,9 +12,19 @@ setup:
 test:
 	go test -v ./...  -race -coverprofile=coverage.out -covermode=atomic
 
-install:
+coverage: test
+	go tool cover -func=coverage.out
+
+coverage-html: test
+	mkdir -p coverage
+	go tool cover -html=coverage.out -o coverage/index.html
+
+coverage-serve: coverage-html
+	python3 -m http.server 8080 -d coverage
+
+install: build
 	cp gozen /usr/local/bin/gozen
-	cp man/gozen.1 /usr/local/share/man/man1/gozen.1
+	# cp man/gozen.1 /usr/local/share/man/man1/gozen.1
 
 build:
 	go build -ldflags="$(LDFLAGS)" -o gozen
