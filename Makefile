@@ -24,7 +24,11 @@ coverage-serve: coverage-html
 
 install: build
 	cp gozen /usr/local/bin/gozen
-	# cp man/gozen.1 /usr/local/share/man/man1/gozen.1
+	cp man/gozen.1 /usr/local/share/man/man1/gozen.1
+
+uninstall:
+	rm /usr/local/bin/gozen
+	rm /usr/local/share/man/man1/gozen.1
 
 build:
 	go build -ldflags="$(LDFLAGS)" -o gozen
