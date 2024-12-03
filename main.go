@@ -10,6 +10,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+    AppVersion = "v0.0.0"
+    CommitHash = "unknown"
+    BuildDate = "unknown"
+)
+
 //go:embed templates/*
 var templatesFS embed.FS
 
@@ -24,6 +30,7 @@ func main() {
 
 	clientApp := cli.NewApp()
 	clientApp.Name = "gozen"
+    clientApp.Version = AppVersion
 	clientApp.Commands = []*cli.Command{
 		{
 			Name:  "create",

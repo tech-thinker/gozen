@@ -3,7 +3,7 @@
 test:
 	go test -v ./...  -race -coverprofile=coverage.out -covermode=atomic
 
-install:
+setup:
 	go mod tidy
 
 run:
