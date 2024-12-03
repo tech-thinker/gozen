@@ -13,6 +13,7 @@ type Project struct {
 	AppName     string `json:"app_name"`
 	PackageName string `json:"package_name"`
 	Driver      string `json:"driver"`
+    WorkingDir  string `json:"-"`
 }
 
 func (p Project) ToJSON() string {
@@ -42,7 +43,12 @@ func (p *Project) LoadFromJsonFile() error {
 }
 
 func (p Project) WriteToJsonFile() error {
-	filename := fmt.Sprintf(`%s/%s/gozen.json`, constants.CURRENT_WORKING_DIRECTORY, p.AppName)
+    workDir := constants.CURRENT_WORKING_DIRECTORY
+    if len(p.WorkingDir) > 1 {
+        workDir = p.WorkingDir
+    }
+
+	filename := fmt.Sprintf(`%s/%s/gozen.json`, workDir, p.AppName)
 	file, err := os.Create(filename)
 	if err != nil {
 		return err

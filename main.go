@@ -63,6 +63,7 @@ func main() {
 					AppName:     ctx.Args().Get(0),
 					PackageName: packageName,
 					Driver:      driver,
+                    WorkingDir:  outputDir,
 				}
 				app := cmd.NewAppCmd(project, helper)
 

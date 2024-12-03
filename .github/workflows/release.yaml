@@ -34,7 +34,7 @@ jobs:
       run: |
         export AppVersion="${{ env.RELEASE_VERSION }}"
         echo "Building version: $AppVersion"
-        make build-all
+        make dist
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v3
