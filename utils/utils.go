@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-
 func GenerateCode(tplFS embed.FS, tplFile string, data interface{}) (string, error) {
 	tpl, err := template.ParseFS(tplFS, tplFile)
 	if err != nil {
@@ -25,20 +24,20 @@ func GenerateCode(tplFS embed.FS, tplFile string, data interface{}) (string, err
 }
 
 func WriteFile(path, data string) error {
-    // Replacing escape characters
-    data = strings.ReplaceAll(data, "&lt;", "<")
-    data = strings.ReplaceAll(data, "&gt;", ">")
-    data = strings.ReplaceAll(data, "&amp;", "&")
+	// Replacing escape characters
+	data = strings.ReplaceAll(data, "&lt;", "<")
+	data = strings.ReplaceAll(data, "&gt;", ">")
+	data = strings.ReplaceAll(data, "&amp;", "&")
 
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-    _, err = fmt.Fprintf(file, `%s`, data)
-    if err != nil {
-        return err
-    }
+	_, err = fmt.Fprintf(file, `%s`, data)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

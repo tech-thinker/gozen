@@ -7,12 +7,35 @@ RUN apt-get update && \
     curl \
     gnupg-agent
 
-RUN curl -sSL https://packagecloud.io/golang-migrate/migrate/gpgkey | apt-key add -
-RUN echo "deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ bionic main" > /etc/apt/sources.list.d/migrate.list
-RUN apt-get update && \
-    apt-get install -y migrate
+RUN apt-get update
 
+# Install modd based on arch
+RUN set -x && \
+    arch=$(dpkg --print-architecture) && \
+    case "$arch" in \
+        amd64) file="modd-0.8-linux64.tgz" ;; \
+        armhf|armel|arm64) file="modd-0.8-linuxARM.tgz" ;; \
+        i386) file="modd-0.8-linux32.tgz" ;; \
+        *) echo "Unsupported architecture: $arch" && exit 1 ;; \
+    esac && \
+    curl -sL "https://github.com/cortesi/modd/releases/download/v0.8/$file" -o modd.tgz && \
+    tar -xf modd.tgz && \
+    cp modd-0.8-*/modd /usr/bin/ && \
+    chmod +x /usr/bin/modd && rm -rf modd.tgz modd-0.8-*
+
+# Install migrate
+RUN set -x && \
+    arch=$(dpkg --print-architecture) && \
+    case "$arch" in \
+        amd64) file="migrate.linux-amd64.deb" ;; \
+        arm64) file="migrate.linux-arm64.deb" ;; \
+        armhf|armel) file="migrate.linux-armv7.deb" ;; \
+        i386) file="migrate.linux-386.deb" ;; \
+        *) echo "Unsupported architecture: $arch" && exit 1 ;; \
+    esac && \
+    curl -sL "https://github.com/golang-migrate/migrate/releases/download/v4.18.1/$file" -o migrate.deb && \
+    dpkg -i migrate.deb && rm migrate.deb
 
 WORKDIR /app
 
-ENTRYPOINT ["bash", "docker/entrypoint-dev.sh"]
+ENTRYPOINT ["modd", "-f", "./docker/modd-debug.conf"]

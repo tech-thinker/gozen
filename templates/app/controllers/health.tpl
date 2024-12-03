@@ -22,12 +22,14 @@ func (c *healthController) Ping(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": err.Error(),
+			"heart_beat": 0,
 		})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": res.Success,
 		"message": res.Message,
+		"heart_beat": res.HeartBeat,
 	})
 }
 

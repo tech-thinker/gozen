@@ -15,20 +15,5 @@ services:
     volumes:
       - "../:/app"
 
-  # app-workers:
-  #   networks:
-  #     - app
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.Workers
-  #   container_name: app-workers
-  #   security_opt:
-  #     - seccomp:unconfined
-  #   env_file: .env
-  #   volumes:
-  #     - "../:/app"
-  #   depends_on:
-  #     - app
-  
 networks:
   app:

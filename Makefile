@@ -34,6 +34,9 @@ build:
 	go build -ldflags="$(LDFLAGS)" -o gozen
 
 dist:
+	cp man/gozen.1 man/gozen.old
+	sed -e "s|BUILDDATE|$(BUILDDATE)|g" -e "s|VERSION|$(VERSION)|g" man/gozen.old > man/gozen.1
+
 	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-amd64
 	cp build/gozen-linux-amd64 build/gozen
 	tar -zcvf build/gozen-linux-amd64.tar.gz build/gozen man/gozen.1
@@ -61,6 +64,9 @@ dist:
 	# Generating checksum
 	cd build && sha256sum * >> checksum-sha256sum.txt
 	cd build && md5sum * >> checksum-md5sum.txt
+
+	# Cleaning
+	mv man/gozen.old man/gozen.1
 
 clean:
 	rm -rf gozen*

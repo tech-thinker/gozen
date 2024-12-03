@@ -1,8 +1,8 @@
 package repository
 
 import (
-    "context"
-    "gorm.io/gorm"
+	"context"
+	"gorm.io/gorm"
 
 	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
@@ -17,7 +17,7 @@ type healthRepo struct {
 }
 
 func (r *healthRepo) Ping(ctx context.Context) (bool, error) {
-    doc := models.Health{
+	doc := models.Health{
 		Success: true,
 		Message: "Service is up and running.",
 	}

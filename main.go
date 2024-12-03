@@ -12,9 +12,9 @@ import (
 )
 
 var (
-    AppVersion = "v0.0.0"
-    CommitHash = "unknown"
-    BuildDate = "unknown"
+	AppVersion = "v0.0.0"
+	CommitHash = "unknown"
+	BuildDate  = "unknown"
 )
 
 //go:embed templates/*
@@ -31,7 +31,7 @@ func main() {
 
 	clientApp := cli.NewApp()
 	clientApp.Name = "gozen"
-    clientApp.Version = AppVersion
+	clientApp.Version = AppVersion
 	clientApp.Commands = []*cli.Command{
 		{
 			Name:  "create",
@@ -64,16 +64,16 @@ func main() {
 					AppName:     ctx.Args().Get(0),
 					PackageName: packageName,
 					Driver:      driver,
-                    WorkingDir:  outputDir,
+					WorkingDir:  outputDir,
 				}
 
-                err := project.Validate()
-                if err != nil {
-                    fmt.Println(err)
-                    return nil
-                }
+				err := project.Validate()
+				if err != nil {
+					fmt.Println(err)
+					return nil
+				}
 
-                project.AutoFixes()
+				project.AutoFixes()
 
 				app := cmd.NewAppCmd(project, helper)
 

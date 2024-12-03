@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-    "github.com/urfave/cli"
 	"github.com/spf13/viper"
+	"github.com/urfave/cli"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
 	"{{.PackageName}}/runner"
