@@ -1,3 +1,3 @@
 package constants
 
-const CURRENT_WORKING_DIRECTORY="."
+const CURRENT_WORKING_DIRECTORY = "."

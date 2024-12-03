@@ -47,7 +47,7 @@ func (runner *api) Go(ctx context.Context, wg *sync.WaitGroup) {
 	signal.Notify(stopChan, os.Interrupt, os.Kill)
 
 	go func() {
-		<- stopChan
+		<-stopChan
 		fmt.Println("\nShutting down server...")
 		cancel()
 
@@ -62,7 +62,10 @@ func (runner *api) Go(ctx context.Context, wg *sync.WaitGroup) {
 		}
 	}()
 
-	logger.Log.Infof("Starting Rest API server on %v...", runner.cfg.APIPort())
+	logger.Log.Infof("Starting Rest API server...")
+	logger.Log.Infof("Listening on server: http://127.0.0.1:%s", runner.cfg.APIPort())
+	logger.Log.Infof("Health check URL: http://127.0.0.1:%s/ping", runner.cfg.APIPort())
+
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}

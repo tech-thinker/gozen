@@ -5,6 +5,7 @@ import (
 
 	"{{.PackageName}}/models"
 	"{{.PackageName}}/repository"
+	"{{.PackageName}}/utils"
 )
 
 type HealthSvc interface {
@@ -12,25 +13,30 @@ type HealthSvc interface {
 }
 
 type healthSvc struct {
-    healthRepo repository.HealthRepo
+	healthRepo repository.HealthRepo
 }
 
 func (svc *healthSvc) Ping(ctx context.Context) (*models.Health, error) {
 
-	// groupError := "PING_HEALTH_SERVICE"
-    // logger.Log.WithError(err).Error(groupError)
-    doc := models.Health{
-        Success: true,
-        Message: "Service is up and running",
-    }
+	status, err := svc.healthRepo.Ping(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	doc := models.Health{
+		Success:   status,
+		Message:   "Service is up and running",
+		HeartBeat: utils.EpochTime(),
+	}
 
 	return &doc, nil
 }
 
 func NewHealthSvc(
-    healthRepo repository.HealthRepo,
+	healthRepo repository.HealthRepo,
 ) HealthSvc {
 	return &healthSvc{
-        healthRepo: healthRepo,
+		healthRepo: healthRepo,
 	}
 }

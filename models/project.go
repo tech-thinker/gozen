@@ -15,20 +15,20 @@ type Project struct {
 	AppName     string `json:"app_name"`
 	PackageName string `json:"package_name"`
 	Driver      string `json:"driver"`
-    WorkingDir  string `json:"-"`
+	WorkingDir  string `json:"-"`
 }
 
 func (p Project) Validate() error {
-    if len(p.PackageName) == 0 {
-        return errors.New("Please provide package name.")
-    }
-    return nil
+	if len(p.PackageName) == 0 {
+		return errors.New("Please provide package name.")
+	}
+	return nil
 }
 
 func (p *Project) AutoFixes() {
-    if len(p.AppName) == 0 {
-        p.AppName = p.PackageName[strings.LastIndex(p.PackageName, "/")+1:]
-    }
+	if len(p.AppName) == 0 {
+		p.AppName = p.PackageName[strings.LastIndex(p.PackageName, "/")+1:]
+	}
 }
 
 func (p Project) ToJSON() string {
@@ -58,10 +58,10 @@ func (p *Project) LoadFromJsonFile() error {
 }
 
 func (p Project) WriteToJsonFile() error {
-    workDir := constants.CURRENT_WORKING_DIRECTORY
-    if len(p.WorkingDir) > 1 {
-        workDir = p.WorkingDir
-    }
+	workDir := constants.CURRENT_WORKING_DIRECTORY
+	if len(p.WorkingDir) > 1 {
+		workDir = p.WorkingDir
+	}
 
 	filename := fmt.Sprintf(`%s/%s/gozen.json`, workDir, p.AppName)
 	file, err := os.Create(filename)

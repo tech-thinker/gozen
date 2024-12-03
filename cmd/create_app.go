@@ -19,10 +19,10 @@ type appCmd struct {
 }
 
 func (cmd *appCmd) CreateApp() error {
-    workDir := constants.CURRENT_WORKING_DIRECTORY
-    if len(cmd.project.WorkingDir) > 1 {
-        workDir = cmd.project.WorkingDir
-    }
+	workDir := constants.CURRENT_WORKING_DIRECTORY
+	if len(cmd.project.WorkingDir) > 1 {
+		workDir = cmd.project.WorkingDir
+	}
 	appPath := fmt.Sprintf(`%s/%s`, workDir, cmd.project.AppName)
 	fmt.Println("Project created at location: " + appPath)
 	utils.CreateDirectory(appPath)
@@ -36,15 +36,13 @@ func (cmd *appCmd) CreateApp() error {
 	cmd.helper.Write("templates/env.sample.tpl", appPath+"/.env.sample", cmd.project)
 	cmd.helper.Write("templates/env.sample.tpl", appPath+"/docker/.env", cmd.project)
 	cmd.helper.Write("templates/env.sample.tpl", appPath+"/docker/.env.sample", cmd.project)
-    cmd.helper.Write("templates/docker/Dockerfile.debug", appPath+"/docker/Dockerfile.debug", cmd.project)
-    cmd.helper.Write("templates/docker/Dockerfile.dev", appPath+"/docker/Dockerfile.dev", cmd.project)
-    cmd.helper.Write("templates/docker/Dockerfile.prod", appPath+"/docker/Dockerfile.prod", cmd.project)
-    cmd.helper.Write("templates/docker/docker-compose-debug.yml", appPath+"/docker/docker-compose-debug.yml", cmd.project)
-    cmd.helper.Write("templates/docker/docker-compose.yml", appPath+"/docker/docker-compose.yml", cmd.project)
-    cmd.helper.Write("templates/docker/entrypoint-debug.sh", appPath+"/docker/entrypoint-debug.sh", cmd.project)
-    cmd.helper.Write("templates/docker/entrypoint-dev.sh", appPath+"/docker/entrypoint-dev.sh", cmd.project)
-    cmd.helper.Write("templates/docker/modd-debug.conf", appPath+"/docker/modd-debug.conf", cmd.project)
-    cmd.helper.Write("templates/docker/modd-dev.conf", appPath+"/docker/modd-dev.conf", cmd.project)
+	cmd.helper.Write("templates/docker/Dockerfile.debug", appPath+"/docker/Dockerfile.debug", cmd.project)
+	cmd.helper.Write("templates/docker/Dockerfile.dev", appPath+"/docker/Dockerfile.dev", cmd.project)
+	cmd.helper.Write("templates/docker/Dockerfile.prod", appPath+"/docker/Dockerfile.prod", cmd.project)
+	cmd.helper.Write("templates/docker/docker-compose-debug.yml", appPath+"/docker/docker-compose-debug.yml", cmd.project)
+	cmd.helper.Write("templates/docker/docker-compose.yml", appPath+"/docker/docker-compose.yml", cmd.project)
+	cmd.helper.Write("templates/docker/modd-debug.conf", appPath+"/docker/modd-debug.conf", cmd.project)
+	cmd.helper.Write("templates/docker/modd-dev.conf", appPath+"/docker/modd-dev.conf", cmd.project)
 
 	cmd.helper.Write("templates/gitignore.tpl", appPath+"/.gitignore", cmd.project)
 	cmd.helper.Write("templates/Makefile.tpl", appPath+"/Makefile", cmd.project)
