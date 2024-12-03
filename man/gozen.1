@@ -1,0 +1,42 @@
+.TH GOZEN 1 "September 25, 2024" "Version 0.1.0" "User Commands"
+.SH NAME
+gozen \- is a simplified golang MVC framework to generate projects and components.
+.SH SYNOPSIS
+.B gozen
+.RI "command " [ options ] " <args>"
+.SH DESCRIPTION
+ is a command-line interface (CLI) tool that simplifies the creation of projects and components in a Go application.
+
+This application is a set of tools that can be used to generate a project structure and a set of components that can be used to build a Go application.
+
+.SH OPTIONS
+.TP
+.B \-p, \-\-pkg
+Package name for new project.
+.TP
+.B \-o, \-\-output
+Output directory for new project. (default: ".")
+.TP
+.B \-d, \-\-driver
+Database driver for new project. eg. [sqlite, mysql, postgres] (default: "sqlite")
+.TP
+.B \-v, \-\-version
+Show the current version of
+.B gozen.
+.TP
+.B \-h, \-\-help
+Display usage information for
+.B gozen.
+
+.SH EXAMPLES
+.TP
+Create a new project
+.B
+gozen create -pkg <package-name> -o <output-dir> <app-name>
+
+.SH SEE ALSO
+.BR vim (1),
+.BR nano (1),
+.SH AUTHOR
+Written by tech-thinker, as part of the `gozen` project.
+
