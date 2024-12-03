@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"os"
 
 	"github.com/tech-thinker/gozen/cmd"
@@ -65,6 +66,15 @@ func main() {
 					Driver:      driver,
                     WorkingDir:  outputDir,
 				}
+
+                err := project.Validate()
+                if err != nil {
+                    fmt.Println(err)
+                    return nil
+                }
+
+                project.AutoFixes()
+
 				app := cmd.NewAppCmd(project, helper)
 
 				return app.CreateApp()

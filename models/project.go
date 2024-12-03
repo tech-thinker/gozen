@@ -2,9 +2,11 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/tech-thinker/gozen/constants"
 )
@@ -14,6 +16,19 @@ type Project struct {
 	PackageName string `json:"package_name"`
 	Driver      string `json:"driver"`
     WorkingDir  string `json:"-"`
+}
+
+func (p Project) Validate() error {
+    if len(p.PackageName) == 0 {
+        return errors.New("Please provide package name.")
+    }
+    return nil
+}
+
+func (p *Project) AutoFixes() {
+    if len(p.AppName) == 0 {
+        p.AppName = p.PackageName[strings.LastIndex(p.PackageName, "/")+1:]
+    }
 }
 
 func (p Project) ToJSON() string {
