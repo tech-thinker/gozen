@@ -37,33 +37,30 @@ dist:
 	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-amd64
 	cp build/gozen-linux-amd64 build/gozen
 	tar -zcvf build/gozen-linux-amd64.tar.gz build/gozen man/gozen.1
-	cd build && sha256sum gozen-linux-amd64.tar.gz > checksum-sha256sum.txt
 
 	GOOS=linux GOARCH=arm64 go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-arm64
 	cp build/gozen-linux-arm64 build/gozen
 	tar -zcvf build/gozen-linux-arm64.tar.gz build/gozen man/gozen.1
-	cd build && sha256sum gozen-linux-arm64.tar.gz >> checksum-sha256sum.txt
 
 	GOOS=linux GOARCH=arm go build -ldflags="$(LDFLAGS)" -o build/gozen-linux-arm
 	cp build/gozen-linux-arm build/gozen
 	tar -zcvf build/gozen-linux-arm.tar.gz build/gozen man/gozen.1
-	cd build && sha256sum gozen-linux-arm.tar.gz >> checksum-sha256sum.txt
 	
 	GOOS=darwin GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-darwin-amd64
 	cp build/gozen-darwin-amd64 build/gozen
 	tar -zcvf build/gozen-darwin-amd64.tar.gz build/gozen man/gozen.1
-	cd build && sha256sum gozen-darwin-amd64.tar.gz >> checksum-sha256sum.txt
 	
 	GOOS=darwin GOARCH=arm64 go build -ldflags="$(LDFLAGS)" -o build/gozen-darwin-arm64
 	cp build/gozen-darwin-arm64 build/gozen
 	tar -zcvf build/gozen-darwin-arm64.tar.gz build/gozen man/gozen.1
-	cd build && sha256sum gozen-darwin-arm64.tar.gz >> checksum-sha256sum.txt
 	rm build/gozen
 	
 	GOOS=windows GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o build/gozen-windows-amd64.exe
-	cd build && sha256sum gozen-windows-amd64.exe >> checksum-sha256sum.txt
 	GOOS=windows GOARCH=386 go build -ldflags="$(LDFLAGS)" -o build/gozen-windows-i386.exe
-	cd build && sha256sum gozen-windows-i386.exe >> checksum-sha256sum.txt
+	
+	# Generating checksum
+	cd build && sha256sum * >> checksum-sha256sum.txt
+	cd build && md5sum * >> checksum-md5sum.txt
 
 clean:
 	rm -rf gozen*
