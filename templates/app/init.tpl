@@ -1,4 +1,4 @@
-package initializer
+package app
 
 import (
 	"{{.PackageName}}/config"
@@ -8,24 +8,24 @@ import (
 	"{{.PackageName}}/service"
 )
 
-// Services is interface for all service entrypoint
-type Services interface {
+// ServiceRegistry is interface for all service entrypoint
+type ServiceRegistry interface {
     HealthService() service.HealthSvc
 	// TODO: add service dependency here
 }
 
-type services struct {
+type serviceRegistry struct {
     healthSvc service.HealthSvc
 	// TODO: add service dependency here
 }
 
-func (svc *services) HealthService() service.HealthSvc {
+func (svc *serviceRegistry) HealthService() service.HealthSvc {
     return svc.healthSvc
 }
 
 
-// Init initializes services repo
-func Init(cfg config.Configuration, instance instance.Instance) Services {
+// Init initializes serviceRegistry repo
+func Init(cfg config.Configuration, instance instance.Instance) ServiceRegistry {
     // Object init
     db := instance.DB()
     registry.LoadModels(db)
@@ -36,7 +36,7 @@ func Init(cfg config.Configuration, instance instance.Instance) Services {
     // Service init
     healthSvc := service.NewHealthSvc(healthRepo)
 	
-    return &services{
+    return &serviceRegistry{
         healthSvc: healthSvc,
     }
 }

@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"{{.PackageName}}/app/initializer"
-	"{{.PackageName}}/app/router"
+	"{{.PackageName}}/app"
+	"{{.PackageName}}/app/rest/router"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
 	"{{.PackageName}}/logger"
@@ -32,7 +32,7 @@ func (runner *api) Go(ctx context.Context, wg *sync.WaitGroup) {
 
 	ctx, cancel := context.WithCancel(ctx)
 
-	svc := initializer.Init(runner.cfg, runner.instance)
+	svc := app.Init(runner.cfg, runner.instance)
 
 	routerV1 := router.Init(svc)
 	s := &http.Server{

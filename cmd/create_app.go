@@ -49,9 +49,9 @@ func (cmd *appCmd) CreateApp() error {
 	cmd.helper.Write("templates/go.tpl", appPath+"/go.mod", cmd.project)
 	cmd.helper.Write("templates/main.tpl", appPath+"/main.go", cmd.project)
 
-	cmd.helper.Write("templates/app/controllers/health.tpl", appPath+"/app/controllers/health.go", cmd.project)
-	cmd.helper.Write("templates/app/initializer/service.tpl", appPath+"/app/initializer/service.go", cmd.project)
-	cmd.helper.Write("templates/app/router/router.tpl", appPath+"/app/router/router.go", cmd.project)
+	cmd.helper.Write("templates/app/init.tpl", appPath+"/app/init.go", cmd.project)
+	cmd.helper.Write("templates/app/rest/controllers/health.tpl", appPath+"/app/rest/controllers/health.go", cmd.project)
+	cmd.helper.Write("templates/app/rest/router/router.tpl", appPath+"/app/rest/router/router.go", cmd.project)
 	cmd.helper.Write("templates/config/config.tpl", appPath+"/config/config.go", cmd.project)
 	cmd.helper.Write("templates/constants/app.tpl", appPath+"/constants/app.go", cmd.project)
 	cmd.helper.Write("templates/instance/instance.tpl", appPath+"/instance/instance.go", cmd.project)

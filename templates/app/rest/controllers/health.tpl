@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
+	"{{.PackageName}}/app"
 	"github.com/gin-gonic/gin"
-	"{{.PackageName}}/app/initializer"
 )
 
 // HealthController is an interface for health controller
@@ -13,7 +13,7 @@ type HealthController interface {
 }
 
 type healthController struct {
-	svc initializer.Services
+	svc app.ServiceRegistry
 }
 
 func (c *healthController) Ping(ctx *gin.Context) {
@@ -34,7 +34,7 @@ func (c *healthController) Ping(ctx *gin.Context) {
 }
 
 // NewHealthController initializes health controller with dependency
-func NewHealthController(svc initializer.Services) HealthController {
+func NewHealthController(svc app.ServiceRegistry) HealthController {
 	return &healthController{
 		svc: svc,
 	}
