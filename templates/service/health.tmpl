@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
 	"{{.PackageName}}/repository"
 	"{{.PackageName}}/utils"
@@ -21,6 +22,7 @@ func (svc *healthSvc) Ping(ctx context.Context) (*models.Health, error) {
 	status, err := svc.healthRepo.Ping(ctx)
 
 	if err != nil {
+		logger.Log.Error(err)
 		return nil, err
 	}
 

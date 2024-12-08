@@ -5,11 +5,11 @@ import (
 	"os"
 	"sync"
 
-	"github.com/spf13/viper"
-	"github.com/urfave/cli"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
 	"{{.PackageName}}/runner"
+	"github.com/spf13/viper"
+	"github.com/urfave/cli"
 )
 
 func main() {
@@ -30,6 +30,9 @@ func main() {
 
 				wg.Add(1)
 				go runner.NewAPI(cfg, instance).Go(context.Background(), &wg)
+
+				wg.Add(1)
+				go runner.NewGrpc(cfg, instance).Go(context.Background(), &wg)
 
 				wg.Wait()
 				return nil

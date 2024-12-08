@@ -6,6 +6,7 @@ type Configuration interface {
 	Version() string
 	AppName() string
 	APIPort() string
+	GrpcPort() string
 
 	DbDriver() string
 	DbHost() string
@@ -18,6 +19,7 @@ type configuration struct {
 	version string
 	appName string
 	apiPort string
+	grpcPort string
 
 	db_driver string
 	db_host   string
@@ -40,6 +42,11 @@ func (cfg *configuration) AppName() string {
 // APIPort returns port
 func (cfg *configuration) APIPort() string {
 	return cfg.apiPort
+}
+
+// GrpcPort returns port
+func (cfg *configuration) GrpcPort() string {
+	return cfg.grpcPort
 }
 
 // DbDriver returns database driver
@@ -82,6 +89,8 @@ func Init(
 	config.version = env.GetString("version")
 	config.apiPort = env.GetString("app_name")
 	config.apiPort = env.GetString("api_port")
+	config.grpcPort = env.GetString("grpc_port")
+	
 	config.db_driver = env.GetString("db_driver")
 	config.db_host = env.GetString("db_host")
 	config.db_port = env.GetString("db_port")

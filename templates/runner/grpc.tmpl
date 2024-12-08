@@ -1,0 +1,77 @@
+package runner
+
+import (
+	"context"
+	"fmt"
+	"net"
+	"os"
+	"os/signal"
+	"sync"
+	"time"
+
+	"{{.PackageName}}/app"
+	"{{.PackageName}}/app/grpc/router"
+	"{{.PackageName}}/config"
+	"{{.PackageName}}/instance"
+	"{{.PackageName}}/logger"
+)
+
+// GrpcRunner is the interface for rest grpcRunner runner
+type GrpcRunner interface {
+	Go(ctx context.Context, wg *sync.WaitGroup)
+}
+
+type grpcRunner struct {
+	cfg      config.Configuration
+	instance instance.Instance
+}
+
+func (runner *grpcRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	ctx, cancel := context.WithCancel(ctx)
+
+	svc := app.Init(runner.cfg, runner.instance)
+
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", runner.cfg.GrpcPort()))
+	if err != nil {
+		logger.Log.Fatalf("Failed to listen: %v", err)
+	}
+
+	routerV1 := router.Init(svc)
+
+	// Channel to listen for interrupt signals
+	stopChan := make(chan os.Signal, 1)
+	signal.Notify(stopChan, os.Interrupt, os.Kill)
+
+	go func() {
+		<-stopChan
+		fmt.Println("\nShutting down server...")
+		cancel()
+
+		// Create a context with timeout for the shutdown process
+		_, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+
+		if err := listener.Close(); err != nil {
+			fmt.Printf("Server forced to shutdown: %v\n", err)
+		} else {
+			fmt.Println("Server stopped gracefully.")
+		}
+	}()
+
+	logger.Log.Infof("Starting gRPC api server...")
+	logger.Log.Infof("Listening on gRPC server: http://127.0.0.1:%s", runner.cfg.GrpcPort())
+	logger.Log.Infof("gRPC health method: /Health/ping")
+	if err := routerV1.Serve(listener); err != nil {
+		logger.Log.Fatalf("Failed to serve: %v", err)
+	}
+}
+
+// NewGrpc returns an instance of the REST GrpcRunner runner
+func NewGrpc(config config.Configuration, instance instance.Instance) GrpcRunner {
+	return &grpcRunner{
+		cfg:      config,
+		instance: instance,
+	}
+}

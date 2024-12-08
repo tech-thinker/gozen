@@ -1,24 +1,23 @@
 package registry
 
 import (
-	"log"
-
+	"{{.PackageName}}/logger"
 	"gorm.io/gorm"
 )
 
 var registeredModels []interface{}
 
 func RegisterModel(model interface{}) {
-    registeredModels = append(registeredModels, model)
+	registeredModels = append(registeredModels, model)
 }
 
 func LoadModels(db *gorm.DB) {
 	for _, model := range registeredModels {
-        if err := migrate(db, model); err != nil {
-            log.Fatal("failed to automigrate models:", err)
-        }
-    }
-	log.Println("All models initialized successfully")
+		if err := migrate(db, model); err != nil {
+			logger.Log.Fatal("failed to automigrate models:", err)
+		}
+	}
+	logger.Log.Println("All models initialized successfully")
 }
 
 func migrate(db *gorm.DB, dst interface{}) error {
@@ -26,12 +25,12 @@ func migrate(db *gorm.DB, dst interface{}) error {
 	if !db.Migrator().HasTable(dst) {
 		err := db.Migrator().CreateTable(dst)
 		if err != nil {
-			log.Println("Failed to create schema:", err)
+			logger.Log.Println("Failed to create schema:", err)
 			return err
 		}
-		log.Println("Schema created successfully")
+		logger.Log.Println("Schema created successfully")
 	} else {
-		log.Println("Schema already exists")
+		logger.Log.Println("Schema already exists")
 	}
 	return nil
 }

@@ -1,0 +1,40 @@
+package handlers
+
+import (
+	"context"
+
+	"{{.PackageName}}/app"
+	pb "{{.PackageName}}/app/grpc/proto"
+	"{{.PackageName}}/logger"
+)
+
+// healthHandler is used to implement the HealthServer interface
+type healthHandler struct {
+	svc app.ServiceRegistry
+	pb.UnimplementedHealthServer
+}
+
+// Ping implementation for the Health service
+func (s *healthHandler) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PongReply, error) {
+	health, err := s.svc.HealthService().Ping(ctx)
+	if err != nil {
+		logger.Log.Println(err)
+		return &pb.PongReply{
+			Message: err.Error(),
+		}, err
+	}
+	logger.Log.Printf("Received Ping request")
+	return &pb.PongReply{
+		HeartBeat: health.HeartBeat,
+		Message:   health.Message,
+		Success:   health.Success,
+	}, nil
+}
+
+func NewHealthHandler(
+	svc app.ServiceRegistry,
+) pb.HealthServer {
+	return &healthHandler{
+		svc: svc,
+	}
+}
