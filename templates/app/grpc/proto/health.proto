@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "app/grpc/proto";
+
+service Health {
+  rpc Ping(PingRequest) returns (PongReply);
+}
+
+message PingRequest {}
+
+message PongReply {
+  int64 heart_beat = 1;
+  string message = 2;
+  bool success = 3;
+}

@@ -3,7 +3,6 @@ package app
 import (
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
-	"{{.PackageName}}/instance/registry"
 	"{{.PackageName}}/repository"
 	"{{.PackageName}}/service"
 )
@@ -28,7 +27,6 @@ func (svc *serviceRegistry) HealthService() service.HealthSvc {
 func Init(cfg config.Configuration, instance instance.Instance) ServiceRegistry {
     // Object init
     db := instance.DB()
-    registry.LoadModels(db)
     
     // Repository init
     healthRepo := repository.NewHealthRepo(db)

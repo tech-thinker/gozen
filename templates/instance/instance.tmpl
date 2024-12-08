@@ -10,6 +10,7 @@ import (
 
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/constants"
+	"{{.PackageName}}/instance/registry"
 )
 
 type Instance interface {
@@ -51,6 +52,7 @@ func Init(cfg config.Configuration) Instance {
 	}
 
 	instance.db = gormDB
+	registry.LoadModels(instance.db)
 
 	// TODO: initialize singleton object here
 

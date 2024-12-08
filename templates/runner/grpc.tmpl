@@ -3,44 +3,42 @@ package runner
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
+	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"time"
 
 	"{{.PackageName}}/app"
-	"{{.PackageName}}/app/rest/router"
+	"{{.PackageName}}/app/grpc/router"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
 	"{{.PackageName}}/logger"
 )
 
-// API is the interface for rest api runner
-type API interface {
+// GrpcRunner is the interface for rest grpcRunner runner
+type GrpcRunner interface {
 	Go(ctx context.Context, wg *sync.WaitGroup)
 }
 
-type api struct {
+type grpcRunner struct {
 	cfg      config.Configuration
 	instance instance.Instance
 }
 
-func (runner *api) Go(ctx context.Context, wg *sync.WaitGroup) {
+func (runner *grpcRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	ctx, cancel := context.WithCancel(ctx)
 
 	svc := app.Init(runner.cfg, runner.instance)
 
-	routerV1 := router.Init(svc)
-	s := &http.Server{
-		Addr:         fmt.Sprintf(":%s", runner.cfg.APIPort()),
-		Handler:      routerV1,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", runner.cfg.GrpcPort()))
+	if err != nil {
+		logger.Log.Fatalf("Failed to listen: %v", err)
 	}
+
+	routerV1 := router.Init(svc)
 
 	// Channel to listen for interrupt signals
 	stopChan := make(chan os.Signal, 1)
@@ -55,25 +53,24 @@ func (runner *api) Go(ctx context.Context, wg *sync.WaitGroup) {
 		_, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 
-		if err := s.Shutdown(ctx); err != nil {
+		if err := listener.Close(); err != nil {
 			fmt.Printf("Server forced to shutdown: %v\n", err)
 		} else {
 			fmt.Println("Server stopped gracefully.")
 		}
 	}()
 
-	logger.Log.Infof("Starting Rest API server...")
-	logger.Log.Infof("Listening on server: http://127.0.0.1:%s", runner.cfg.APIPort())
-	logger.Log.Infof("Health check URL: http://127.0.0.1:%s/ping", runner.cfg.APIPort())
-
-	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatal(err)
+	logger.Log.Infof("Starting gRPC api server...")
+	logger.Log.Infof("Listening on gRPC server: http://127.0.0.1:%s", runner.cfg.GrpcPort())
+	logger.Log.Infof("gRPC health method: /Health/ping")
+	if err := routerV1.Serve(listener); err != nil {
+		logger.Log.Fatalf("Failed to serve: %v", err)
 	}
 }
 
-// NewAPI returns an instance of the REST API runner
-func NewAPI(config config.Configuration, instance instance.Instance) API {
-	return &api{
+// NewGrpc returns an instance of the REST GrpcRunner runner
+func NewGrpc(config config.Configuration, instance instance.Instance) GrpcRunner {
+	return &grpcRunner{
 		cfg:      config,
 		instance: instance,
 	}

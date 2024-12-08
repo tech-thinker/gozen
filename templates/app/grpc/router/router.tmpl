@@ -1,0 +1,19 @@
+package router
+
+import (
+	"{{.PackageName}}/app"
+	"{{.PackageName}}/app/grpc/handlers"
+	pb "{{.PackageName}}/app/grpc/proto"
+	"google.golang.org/grpc"
+)
+
+// Init sets router
+func Init(svc app.ServiceRegistry) *grpc.Server {
+	router := grpc.NewServer()
+
+	healthHandler := handlers.NewHealthHandler(svc)
+
+	pb.RegisterHealthServer(router, healthHandler)
+
+	return router
+}
