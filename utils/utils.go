@@ -3,9 +3,7 @@ package utils
 import (
 	"bytes"
 	"embed"
-	"fmt"
 	"html/template"
-	"os"
 	"strings"
 )
 
@@ -23,24 +21,9 @@ func GenerateCode(tplFS embed.FS, tplFile string, data interface{}) (string, err
 	return buf.String(), nil
 }
 
-func WriteFile(path, data string) error {
-	// Replacing escape characters
+func ApplyEscapeChar(data string) string {
 	data = strings.ReplaceAll(data, "&lt;", "<")
 	data = strings.ReplaceAll(data, "&gt;", ">")
 	data = strings.ReplaceAll(data, "&amp;", "&")
-
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = fmt.Fprintf(file, `%s`, data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func CreateDirectory(path string) error {
-	return os.MkdirAll(path, os.ModePerm)
+	return data
 }

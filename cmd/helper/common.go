@@ -3,11 +3,11 @@ package helper
 import (
 	"embed"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/tech-thinker/gozen/utils"
+	"github.com/tech-thinker/gozen/wrappers"
 )
 
 type CommonHelper interface {
@@ -17,13 +17,15 @@ type CommonHelper interface {
 }
 
 type commonHelper struct {
-	templatesFS embed.FS
+	templatesFS    embed.FS
+	shellRepo      wrappers.ShellWrapper
+	fileSystemRepo wrappers.FileSystemWrapper
 }
 
 // Write: generate code and write to file
 func (helper *commonHelper) Write(templatePath string, outputPath string, data interface{}) error {
 	baseDir := filepath.Dir(outputPath)
-	err := utils.CreateDirectory(baseDir)
+	err := helper.fileSystemRepo.CreateDirectory(baseDir)
 	if err != nil {
 		return err
 	}
@@ -31,14 +33,14 @@ func (helper *commonHelper) Write(templatePath string, outputPath string, data i
 	if err != nil {
 		return err
 	}
-	return utils.WriteFile(outputPath, tpl)
+	tpl = utils.ApplyEscapeChar(tpl)
+	return helper.fileSystemRepo.WriteFile(outputPath, tpl)
 }
 
 // ExecShell: execute shell command and return output as string slice
 func (helper *commonHelper) ExecShell(command string, args ...string) ([]string, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
-	cmd := exec.Command(command, args...)
-	output, err := cmd.Output()
+	output, err := helper.shellRepo.Exec(command, args...)
 	if err != nil {
 		fmt.Println("Error executing command:", err)
 		return nil, err
@@ -50,8 +52,7 @@ func (helper *commonHelper) ExecShell(command string, args ...string) ([]string,
 // ExecShellRaw: execute shell command and return output as byte array
 func (helper *commonHelper) ExecShellRaw(command string, args ...string) ([]byte, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
-	cmd := exec.Command(command, args...)
-	output, err := cmd.Output()
+	output, err := helper.shellRepo.Exec(command, args...)
 	if err != nil {
 		fmt.Println("Error executing command:", err)
 		return nil, err
@@ -60,8 +61,14 @@ func (helper *commonHelper) ExecShellRaw(command string, args ...string) ([]byte
 }
 
 // NewCommonHelper returns a new CommonHelper
-func NewCommonHelper(tpl embed.FS) CommonHelper {
+func NewCommonHelper(
+	tpl embed.FS,
+	shellRepo wrappers.ShellWrapper,
+	fileSystemRepo wrappers.FileSystemWrapper,
+) CommonHelper {
 	return &commonHelper{
-		templatesFS: tpl,
+		templatesFS:    tpl,
+		shellRepo:      shellRepo,
+		fileSystemRepo: fileSystemRepo,
 	}
 }
