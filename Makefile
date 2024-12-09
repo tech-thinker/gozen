@@ -71,3 +71,8 @@ dist:
 clean:
 	rm -rf gozen*
 	rm -rf build
+
+generate-mocks:
+	# Mockery version v2.50.0
+	@mockery --name=ShellRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=shell_repo_mock.go --structname=ShellRepoMock
+	@mockery --name=FileSystemRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=file_system_repo_mock.go --structname=FileSystemRepoMock
