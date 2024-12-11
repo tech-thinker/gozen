@@ -8,6 +8,7 @@ gozen
 gozen-*
 
 # Test binary, built with `go test -c`
+_test_*
 *.test
 *.out
 coverage.out
@@ -15,3 +16,4 @@ coverage.out
 # Directory
 build/
 coverage/
+.vscode
