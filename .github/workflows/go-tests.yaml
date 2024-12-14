@@ -2,22 +2,52 @@ name: Go Tests
 
 on:
   push:
-    branches: [ 'main', 'develop' ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ '*' ]
+    branches: ["*"]
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.22
-    - name: Build
-      run: make build
-    - name: Test
-      run: make test
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+      - name: Build
+        run: make build
+      - name: Test
+        run: make test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+      - name: Build
+        run: make build
+      - name: Create project
+        run: ./gozen create -pkg github.com/tech-thinker/demo-app
+      - name: Test newly created app
+        run: |
+          cd demo-app
+          make setup
+          make build
+          export $(cat .env|xargs)
+          ./demo-app start &
+          APP_PID=$!
+          sleep 5
+          curl -sS "http://127.0.0.1:3000/ping" | jq
+          if [[ $? -ne 0 ]]; then
+            echo "curl failed with error code $?"
+          fi
+          # Killing process
+          kill "$APP_PID"
+          echo "App with PID $APP_PID killed."
+      - name: Remove newly created app
+        run: rm -rf demo-app

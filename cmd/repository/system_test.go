@@ -1,4 +1,4 @@
-package helper
+package repository
 
 import (
 	"embed"
@@ -11,7 +11,7 @@ import (
 	"github.com/tech-thinker/gozen/wrappers"
 )
 
-func Test_commonHelper_Write(t *testing.T) {
+func Test_systemRepo_Write(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
 		shellWrapper      *wrappers.ShellWrapperMock
@@ -97,19 +97,19 @@ func Test_commonHelper_Write(t *testing.T) {
 				tt.prepare(&tt.fields)
 			}
 
-			helper := NewCommonHelper(
+			systemRepo := NewSystemRepo(
 				tt.fields.templatesFS,
 				tt.fields.shellWrapper,
 				tt.fields.fileSystemWrapper,
 			)
-			if err := helper.Write(tt.args.templatePath, tt.args.outputPath, tt.args.data); (err != nil) != tt.wantErr {
-				t.Errorf("commonHelper.Write() error = %v, wantErr %v", err, tt.wantErr)
+			if err := systemRepo.Write(tt.args.templatePath, tt.args.outputPath, tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("systemRepo.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_commonHelper_ExecShell(t *testing.T) {
+func Test_systemRepo_ExecShell(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
 		shellWrapper      *wrappers.ShellWrapperMock
@@ -166,24 +166,24 @@ func Test_commonHelper_ExecShell(t *testing.T) {
 				tt.prepare(&tt.fields)
 			}
 
-			helper := NewCommonHelper(
+			systemRepo := NewSystemRepo(
 				tt.fields.templatesFS,
 				tt.fields.shellWrapper,
 				tt.fields.fileSystemWrapper,
 			)
-			got, err := helper.ExecShell(tt.args.command, tt.args.args...)
+			got, err := systemRepo.ExecShell(tt.args.command, tt.args.args...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("commonHelper.ExecShell() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("systemRepo.ExecShell() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("commonHelper.ExecShell() = %v, want %v", got, tt.want)
+				t.Errorf("systemRepo.ExecShell() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_commonHelper_ExecShellRaw(t *testing.T) {
+func Test_systemRepo_ExecShellRaw(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
 		shellWrapper      *wrappers.ShellWrapperMock
@@ -239,18 +239,18 @@ func Test_commonHelper_ExecShellRaw(t *testing.T) {
 				tt.prepare(&tt.fields)
 			}
 
-			helper := NewCommonHelper(
+			systemRepo := NewSystemRepo(
 				tt.fields.templatesFS,
 				tt.fields.shellWrapper,
 				tt.fields.fileSystemWrapper,
 			)
-			got, err := helper.ExecShellRaw(tt.args.command, tt.args.args...)
+			got, err := systemRepo.ExecShellRaw(tt.args.command, tt.args.args...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("commonHelper.ExecShellRaw() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("systemRepo.ExecShellRaw() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("commonHelper.ExecShellRaw() = %v, want %v", got, tt.want)
+				t.Errorf("systemRepo.ExecShellRaw() = %v, want %v", got, tt.want)
 			}
 		})
 	}

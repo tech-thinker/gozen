@@ -5,7 +5,8 @@ import (
 	"os"
 
 	"github.com/tech-thinker/gozen/cmd"
-	"github.com/tech-thinker/gozen/cmd/helper"
+	"github.com/tech-thinker/gozen/cmd/helpers"
+	"github.com/tech-thinker/gozen/cmd/repository"
 	"github.com/tech-thinker/gozen/cmd/service"
 	"github.com/tech-thinker/gozen/wrappers"
 	"github.com/urfave/cli/v2"
@@ -22,11 +23,15 @@ var templatesFS embed.FS
 
 func main() {
 
-	shellRepo := wrappers.NewShellWrapper()
-	fileSystemRepo := wrappers.NewFileSystemWrapper()
+	shellWrapper := wrappers.NewShellWrapper()
+	fileSystemWrapper := wrappers.NewFileSystemWrapper()
 
-	commonHelper := helper.NewCommonHelper(templatesFS, shellRepo, fileSystemRepo)
-	appSvc := service.NewAppService(fileSystemRepo, commonHelper)
+	systemRepo := repository.NewSystemRepo(templatesFS, shellWrapper, fileSystemWrapper)
+	projectRepo := repository.NewProjectRepo(fileSystemWrapper)
+
+	projectHelper := helpers.NewProjectHelper(systemRepo)
+
+	appSvc := service.NewAppService(systemRepo, projectRepo, projectHelper)
 	app := cmd.NewApp(appSvc)
 
 	cliApp := cli.NewApp()

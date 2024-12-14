@@ -1,4 +1,4 @@
-package helper
+package repository
 
 import (
 	"embed"
@@ -10,20 +10,20 @@ import (
 	"github.com/tech-thinker/gozen/wrappers"
 )
 
-type CommonHelper interface {
+type SystemRepo interface {
 	Write(templatePath string, outputPath string, data interface{}) error
 	ExecShell(command string, args ...string) ([]string, error)
 	ExecShellRaw(command string, args ...string) ([]byte, error)
 }
 
-type commonHelper struct {
+type systemRepo struct {
 	templatesFS    embed.FS
 	shellRepo      wrappers.ShellWrapper
 	fileSystemRepo wrappers.FileSystemWrapper
 }
 
 // Write: generate code and write to file
-func (helper *commonHelper) Write(templatePath string, outputPath string, data interface{}) error {
+func (helper *systemRepo) Write(templatePath string, outputPath string, data interface{}) error {
 	baseDir := filepath.Dir(outputPath)
 	err := helper.fileSystemRepo.CreateDirectory(baseDir)
 	if err != nil {
@@ -38,7 +38,7 @@ func (helper *commonHelper) Write(templatePath string, outputPath string, data i
 }
 
 // ExecShell: execute shell command and return output as string slice
-func (helper *commonHelper) ExecShell(command string, args ...string) ([]string, error) {
+func (helper *systemRepo) ExecShell(command string, args ...string) ([]string, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
 	output, err := helper.shellRepo.Exec(command, args...)
 	if err != nil {
@@ -50,7 +50,7 @@ func (helper *commonHelper) ExecShell(command string, args ...string) ([]string,
 }
 
 // ExecShellRaw: execute shell command and return output as byte array
-func (helper *commonHelper) ExecShellRaw(command string, args ...string) ([]byte, error) {
+func (helper *systemRepo) ExecShellRaw(command string, args ...string) ([]byte, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
 	output, err := helper.shellRepo.Exec(command, args...)
 	if err != nil {
@@ -60,13 +60,13 @@ func (helper *commonHelper) ExecShellRaw(command string, args ...string) ([]byte
 	return output, nil
 }
 
-// NewCommonHelper returns a new CommonHelper
-func NewCommonHelper(
+// NewSystemRepo returns a new SystemRepo
+func NewSystemRepo(
 	tpl embed.FS,
 	shellRepo wrappers.ShellWrapper,
 	fileSystemRepo wrappers.FileSystemWrapper,
-) CommonHelper {
-	return &commonHelper{
+) SystemRepo {
+	return &systemRepo{
 		templatesFS:    tpl,
 		shellRepo:      shellRepo,
 		fileSystemRepo: fileSystemRepo,
