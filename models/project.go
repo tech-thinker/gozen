@@ -31,6 +31,18 @@ func (p *Project) AutoFixes() {
 	}
 }
 
+func (p *Project) GetCWD() string {
+	workDir := constants.CURRENT_WORKING_DIRECTORY
+	if len(p.WorkingDir) > 1 {
+		workDir = p.WorkingDir
+	}
+	return workDir
+}
+
+func (p *Project) GetAppDir() string {
+	return fmt.Sprintf(`%s/%s`, p.GetCWD(), p.AppName)
+}
+
 func (p Project) ToJSON() string {
 	bytes, err := json.Marshal(p)
 	if err != nil {
