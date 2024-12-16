@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"os"
 
 	"github.com/tech-thinker/gozen/cmd"
@@ -12,6 +13,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+/**
+ * This section defines constants for the application version, commit hash, and build date.  These are likely populated during the build process.
+ */
 var (
 	AppVersion = "v0.0.0"
 	CommitHash = "unknown"
@@ -41,6 +45,7 @@ func main() {
 		app.CreateProject(),
 	}
 	if err := cliApp.Run(os.Args); err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

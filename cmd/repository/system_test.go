@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/tech-thinker/gozen/models"
 	"github.com/tech-thinker/gozen/utils"
 	"github.com/tech-thinker/gozen/wrappers"
 )
@@ -18,6 +19,7 @@ func Test_systemRepo_Write(t *testing.T) {
 		fileSystemWrapper *wrappers.FileSystemWrapperMock
 	}
 	type args struct {
+		appDir       string
 		templatePath string
 		outputPath   string
 		data         interface{}
@@ -37,8 +39,9 @@ func Test_systemRepo_Write(t *testing.T) {
 				f.fileSystemWrapper.On("WriteFile", mock.Anything, mock.Anything).Return(nil)
 			},
 			args: args{
+				appDir:       ".",
 				templatePath: "test.tmpl",
-				outputPath:   "./test.go",
+				outputPath:   "/test.go",
 				data:         struct{ Name string }{Name: "Test"},
 			},
 			wantErr: false,
@@ -50,8 +53,9 @@ func Test_systemRepo_Write(t *testing.T) {
 				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(errors.New("error"))
 			},
 			args: args{
+				appDir:       ".",
 				templatePath: "test.tmpl",
-				outputPath:   "./test.go",
+				outputPath:   "/test.go",
 				data:         struct{ Name string }{Name: "Test"},
 			},
 			wantErr: true,
@@ -64,8 +68,9 @@ func Test_systemRepo_Write(t *testing.T) {
 				f.fileSystemWrapper.On("WriteFile", mock.Anything, mock.Anything).Return(errors.New("error"))
 			},
 			args: args{
+				appDir:       ".",
 				templatePath: "test.tmpl",
-				outputPath:   "./test.go",
+				outputPath:   "/test.go",
 				data:         struct{ Name string }{Name: "Test"},
 			},
 			wantErr: true,
@@ -77,8 +82,9 @@ func Test_systemRepo_Write(t *testing.T) {
 				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(nil)
 			},
 			args: args{
+				appDir:       ".",
 				templatePath: "test.tmpl",
-				outputPath:   "./test.go",
+				outputPath:   "/test.go",
 				data:         struct{ name string }{name: "Test"},
 			},
 			wantErr: true,
@@ -102,7 +108,113 @@ func Test_systemRepo_Write(t *testing.T) {
 				tt.fields.shellWrapper,
 				tt.fields.fileSystemWrapper,
 			)
-			if err := systemRepo.Write(tt.args.templatePath, tt.args.outputPath, tt.args.data); (err != nil) != tt.wantErr {
+			if err := systemRepo.Write(tt.args.appDir, tt.args.templatePath, tt.args.outputPath, tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("systemRepo.Write() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_systemRepo_WriteAll(t *testing.T) {
+	type fields struct {
+		templatesFS       embed.FS
+		shellWrapper      *wrappers.ShellWrapperMock
+		fileSystemWrapper *wrappers.FileSystemWrapperMock
+	}
+	type args struct {
+		appDir      string
+		fileConfigs []models.FileConfig
+		data        interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		prepare func(f *fields)
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "with valid data should success",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(nil)
+				f.fileSystemWrapper.On("WriteFile", mock.Anything, mock.Anything).Return(nil)
+			},
+			args: args{
+				appDir: ".",
+				fileConfigs: []models.FileConfig{
+					{TemplatePath: "test.tmpl", Destination: "/test.go"},
+				},
+				data: struct{ Name string }{Name: "Test"},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "with directory creation fail should fail",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(errors.New("error"))
+			},
+			args: args{
+				appDir: ".",
+				fileConfigs: []models.FileConfig{
+					{TemplatePath: "test.tmpl", Destination: "/test.go"},
+				},
+				data: struct{ Name string }{Name: "Test"},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "with file write fail should fail",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(nil)
+				f.fileSystemWrapper.On("WriteFile", mock.Anything, mock.Anything).Return(errors.New("error"))
+			},
+			args: args{
+				appDir: ".",
+				fileConfigs: []models.FileConfig{
+					{TemplatePath: "test.tmpl", Destination: "/test.go"},
+				},
+				data: struct{ Name string }{Name: "Test"},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "with code generation fail should fail",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.fileSystemWrapper.On("CreateDirectory", mock.Anything).Return(nil)
+			},
+			args: args{
+				appDir: ".",
+				fileConfigs: []models.FileConfig{
+					{TemplatePath: "test.tmpl", Destination: "/test.go"},
+				},
+				data: struct{ name string }{name: "Test"},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Preparing mocks
+			tt.fields = fields{
+				templatesFS:       utils.GetMockTmpl(),
+				shellWrapper:      wrappers.NewShellWrapperMock(t),
+				fileSystemWrapper: wrappers.NewFileSystemWrapperMock(t),
+			}
+
+			if tt.prepare != nil {
+				tt.prepare(&tt.fields)
+			}
+
+			systemRepo := NewSystemRepo(
+				tt.fields.templatesFS,
+				tt.fields.shellWrapper,
+				tt.fields.fileSystemWrapper,
+			)
+			if err := systemRepo.WriteAll(tt.args.appDir, tt.args.fileConfigs, tt.args.data); (err != nil) != tt.wantErr {
 				t.Errorf("systemRepo.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

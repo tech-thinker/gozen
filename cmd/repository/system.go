@@ -6,12 +6,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tech-thinker/gozen/models"
 	"github.com/tech-thinker/gozen/utils"
 	"github.com/tech-thinker/gozen/wrappers"
 )
 
 type SystemRepo interface {
-	Write(templatePath string, outputPath string, data interface{}) error
+	Write(appDir string, templatePath string, destination string, data interface{}) error
+	WriteAll(appDir string, fileConfigs []models.FileConfig, data interface{}) error
 	ExecShell(command string, args ...string) ([]string, error)
 	ExecShellRaw(command string, args ...string) ([]byte, error)
 }
@@ -23,24 +25,40 @@ type systemRepo struct {
 }
 
 // Write: generate code and write to file
-func (helper *systemRepo) Write(templatePath string, outputPath string, data interface{}) error {
+func (repo *systemRepo) Write(appDir string, templatePath string, destination string, data interface{}) error {
+	outputPath := filepath.Join(appDir, destination)
 	baseDir := filepath.Dir(outputPath)
-	err := helper.fileSystemRepo.CreateDirectory(baseDir)
+	err := repo.fileSystemRepo.CreateDirectory(baseDir)
 	if err != nil {
 		return err
 	}
-	tpl, err := utils.GenerateCode(helper.templatesFS, templatePath, data)
+	tpl, err := utils.GenerateCode(repo.templatesFS, templatePath, data)
 	if err != nil {
 		return err
 	}
 	tpl = utils.ApplyEscapeChar(tpl)
-	return helper.fileSystemRepo.WriteFile(outputPath, tpl)
+	return repo.fileSystemRepo.WriteFile(outputPath, tpl)
+}
+
+// WriteAll: generate codes and write to files
+func (repo *systemRepo) WriteAll(appDir string, fileConfigs []models.FileConfig, data interface{}) error {
+	var errs []error
+	for _, fileConfig := range fileConfigs {
+		err := repo.Write(appDir, fileConfig.TemplatePath, fileConfig.Destination, data)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("WriteAll encountered errors: %v", errs)
+	}
+	return nil
 }
 
 // ExecShell: execute shell command and return output as string slice
-func (helper *systemRepo) ExecShell(command string, args ...string) ([]string, error) {
+func (repo *systemRepo) ExecShell(command string, args ...string) ([]string, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
-	output, err := helper.shellRepo.Exec(command, args...)
+	output, err := repo.shellRepo.Exec(command, args...)
 	if err != nil {
 		fmt.Println("Error executing command:", err)
 		return nil, err
@@ -50,9 +68,9 @@ func (helper *systemRepo) ExecShell(command string, args ...string) ([]string, e
 }
 
 // ExecShellRaw: execute shell command and return output as byte array
-func (helper *systemRepo) ExecShellRaw(command string, args ...string) ([]byte, error) {
+func (repo *systemRepo) ExecShellRaw(command string, args ...string) ([]byte, error) {
 	fmt.Printf(`%s %+v\n`, command, args)
-	output, err := helper.shellRepo.Exec(command, args...)
+	output, err := repo.shellRepo.Exec(command, args...)
 	if err != nil {
 		fmt.Println("Error executing command:", err)
 		return nil, err
