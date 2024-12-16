@@ -74,6 +74,11 @@ clean:
 
 generate-mocks:
 	# Mockery version v2.50.0
-	@mockery --name=ShellWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=shell_wrapper_mock.go --structname=ShellWrapperMock
-	@mockery --name=FileSystemWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=file_system_wrapper_mock.go --structname=FileSystemWrapperMock
-	# @mockery --name=FileSystemWrapper --dir=cmd/wrappers --output=cmd/wrappers --outpkg=wrappers --filename=file_system_repo_mock.go --structname=FileSystemWrapperMock
+	# Wrapper
+	@mockery --name=ShellWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=shellWrapper_mock.go --structname=ShellWrapperMock
+	@mockery --name=FileSystemWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=fileSystemWrapper_mock.go --structname=FileSystemWrapperMock
+	# Repository
+	@mockery --name=SystemRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=system_mock.go --structname=SystemRepoMock
+	@mockery --name=ProjectRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=project_mock.go --structname=ProjectRepoMock
+	# Helpers
+	@mockery --name=ProjectHelper --dir=cmd/helpers --output=cmd/helpers --outpkg=helpers --filename=projectHelper_mock.go --structname=ProjectHelperMock
