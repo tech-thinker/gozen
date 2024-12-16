@@ -35,7 +35,7 @@ func main() {
 
 	projectHelper := helpers.NewProjectHelper(systemRepo)
 
-	appSvc := service.NewAppService(systemRepo, projectRepo, projectHelper)
+	appSvc := service.NewAppService(projectRepo, projectHelper)
 	app := cmd.NewApp(appSvc)
 
 	cliApp := cli.NewApp()

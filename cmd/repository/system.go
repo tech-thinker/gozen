@@ -11,10 +11,15 @@ import (
 	"github.com/tech-thinker/gozen/wrappers"
 )
 
+// SystemRepo is an interface that defines methods for interacting with the system.  This includes writing files, executing shell commands, and managing the file system.
 type SystemRepo interface {
+	// Write generates code from a template and writes it to a file.
 	Write(appDir string, templatePath string, destination string, data interface{}) error
+	// WriteAll generates code from multiple templates and writes them to their respective files.
 	WriteAll(appDir string, fileConfigs []models.FileConfig, data interface{}) error
+	// ExecShell executes a shell command with arguments and returns the output as a string slice.
 	ExecShell(command string, args ...string) ([]string, error)
+	// ExecShellRaw executes a shell command with arguments and returns the raw byte output.
 	ExecShellRaw(command string, args ...string) ([]byte, error)
 }
 

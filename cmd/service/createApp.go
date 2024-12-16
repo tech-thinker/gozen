@@ -11,20 +11,23 @@ type AppService interface {
 }
 
 type appService struct {
-	systemRepo    repository.SystemRepo
 	projectRepo   repository.ProjectRepo
 	projectHelper helpers.ProjectHelper
 }
 
 func (cmd *appService) CreateApp(project models.Project) error {
 	// Create project
-	cmd.projectRepo.Create(project)
-
-	// Generating basic codes
-	err := cmd.projectHelper.InitProject(project)
+	err := cmd.projectRepo.Create(project)
 	if err != nil {
 		return err
 	}
+
+	// Generating basic codes
+	err = cmd.projectHelper.InitProject(project)
+	if err != nil {
+		return err
+	}
+
 	err = cmd.projectHelper.SetupEnv(project)
 	if err != nil {
 		return err
@@ -67,6 +70,9 @@ func (cmd *appService) CreateApp(project models.Project) error {
 	}
 	// Utils
 	err = cmd.projectHelper.SetupUtils(project)
+	if err != nil {
+		return err
+	}
 
 	// Rest
 	err = cmd.projectHelper.CreateRestAPI(project)
@@ -83,12 +89,10 @@ func (cmd *appService) CreateApp(project models.Project) error {
 }
 
 func NewAppService(
-	systemRepo repository.SystemRepo,
 	projectRepo repository.ProjectRepo,
 	projectHelper helpers.ProjectHelper,
 ) AppService {
 	return &appService{
-		systemRepo:    systemRepo,
 		projectRepo:   projectRepo,
 		projectHelper: projectHelper,
 	}
