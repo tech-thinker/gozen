@@ -18,13 +18,17 @@ type appService struct {
 
 func (cmd *appService) CreateApp(project models.Project) error {
 	// Create project
-	cmd.projectRepo.Create(project)
-
-	// Generating basic codes
-	err := cmd.projectHelper.InitProject(project)
+	err := cmd.projectRepo.Create(project)
 	if err != nil {
 		return err
 	}
+
+	// Generating basic codes
+	err = cmd.projectHelper.InitProject(project)
+	if err != nil {
+		return err
+	}
+
 	err = cmd.projectHelper.SetupEnv(project)
 	if err != nil {
 		return err
