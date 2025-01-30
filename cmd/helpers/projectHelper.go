@@ -30,6 +30,7 @@ func (h *projectHelper) InitProject(project models.Project) error {
 		{TemplatePath: "templates/Makefile.tmpl", Destination: "/Makefile"},
 		{TemplatePath: "templates/go.tmpl", Destination: "/go.mod"},
 		{TemplatePath: "templates/main.tmpl", Destination: "/main.go"},
+		{TemplatePath: "templates/editorconfig.tmpl", Destination: "/.editorconfig"},
 		{TemplatePath: "templates/instance/instance.tmpl", Destination: "/instance/instance.go"},
 		{TemplatePath: "templates/app/init.tmpl", Destination: "/app/init.go"},
 	}
@@ -110,7 +111,7 @@ func (h *projectHelper) CreategRPCAPI(project models.Project) error {
 		{TemplatePath: "templates/app/grpc/handlers/health.tmpl", Destination: "/app/grpc/handlers/health.go"},
 		{TemplatePath: "templates/app/grpc/proto/health.proto", Destination: "/app/grpc/proto/health.proto"},
 		{TemplatePath: "templates/app/grpc/proto/health.pb.tmpl", Destination: "/app/grpc/proto/health.pb.go"},
-		{TemplatePath: "templates/app/grpc/proto/health_grpc.pb.tmpl", Destination: "/app/grpc/proto/health_hrpc.pb.go"},
+		{TemplatePath: "templates/app/grpc/proto/health_grpc.pb.tmpl", Destination: "/app/grpc/proto/health_grpc.pb.go"},
 		{TemplatePath: "templates/app/grpc/router/router.tmpl", Destination: "/app/grpc/router/router.go"},
 		{TemplatePath: "templates/runner/grpc.tmpl", Destination: "/runner/grpc.go"},
 	}
