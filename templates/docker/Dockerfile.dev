@@ -36,6 +36,9 @@ RUN set -x && \
     curl -sL "https://github.com/golang-migrate/migrate/releases/download/v4.18.1/$file" -o migrate.deb && \
     dpkg -i migrate.deb && rm migrate.deb
 
+# Installing networking tools
+RUN apt install -y inetutils-ping
+
 WORKDIR /app
 
 ENTRYPOINT ["modd", "-f", "./docker/modd-dev.conf"]

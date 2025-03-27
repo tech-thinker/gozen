@@ -82,3 +82,4 @@ generate-mocks:
 	@mockery --name=ProjectRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=project_mock.go --structname=MockProjectRepo
 	# Helpers
 	@mockery --name=ProjectHelper --dir=cmd/helpers --output=cmd/helpers --outpkg=helpers --filename=projectHelper_mock.go --structname=MockProjectHelper
+	@mockery --name=CodeHelper --dir=cmd/helpers --output=cmd/helpers --outpkg=helpers --filename=codeHelper_mock.go --structname=MockCodeHelper

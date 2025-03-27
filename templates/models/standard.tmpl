@@ -1,0 +1,11 @@
+package models
+
+import "{{.PackageName}}/instance/registry"
+
+type {{.InterfaceName}} struct {
+	ID uint
+}
+
+func init() {
+	registry.RegisterModel(new({{.InterfaceName}}))
+}

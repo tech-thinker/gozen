@@ -1,0 +1,117 @@
+package repository
+
+import (
+	"context"
+	"fmt"
+
+	"gorm.io/gorm"
+
+	"{{.PackageName}}/logger"
+	"{{.PackageName}}/models"
+)
+
+type {{.InterfaceName}}Repo interface {
+	Insert(ctx context.Context, doc models.{{.InterfaceName}}) (uint, error)
+	InsertAll(ctx context.Context, docs []models.{{.InterfaceName}}) (bool, error)
+	Update(ctx context.Context, doc models.{{.InterfaceName}}, field string, value any) (bool, error)
+	UpdateAll(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error)
+	Delete(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error)
+	DeleteAll(ctx context.Context, ids []uint) (bool, error)
+	FindByID(ctx context.Context, id uint) (*models.{{.InterfaceName}}, error)
+	FindBy(ctx context.Context, key string, value any) (*models.{{.InterfaceName}}, error)
+	FindAll(ctx context.Context) ([]models.{{.InterfaceName}}, error)
+}
+
+type {{.StructName}}Repo struct {
+	db *gorm.DB
+}
+
+func (r *{{.StructName}}Repo) Insert(ctx context.Context, doc models.{{.InterfaceName}}) (uint, error) {
+	result := r.db.Create(doc)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return 0, result.Error
+	}
+	return doc.ID, nil
+}
+
+func (r *{{.StructName}}Repo) InsertAll(ctx context.Context, docs []models.{{.InterfaceName}}) (bool, error) {
+	result := r.db.Create(docs)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func (r *{{.StructName}}Repo) Update(ctx context.Context, doc models.{{.InterfaceName}}, field string, value any) (bool, error) {
+	result := r.db.Model(&doc).Update(field, value)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func (r *{{.StructName}}Repo) UpdateAll(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
+	result := r.db.Updates(doc)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func (r *{{.StructName}}Repo) Delete(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
+	result := r.db.Delete(doc)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func (r *{{.StructName}}Repo) DeleteAll(ctx context.Context, ids []uint) (bool, error) {
+	result := r.db.Where("ID in ?", ids).Delete(&models.{{.InterfaceName}}{})
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return false, result.Error
+	}
+	return true, nil
+}
+
+func (r *{{.StructName}}Repo) FindByID(ctx context.Context, id uint) (*models.{{.InterfaceName}}, error) {
+	var doc models.{{.InterfaceName}}
+	result := r.db.First(&doc, id)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return &doc, result.Error
+	}
+	return &doc, nil
+}
+
+func (r *{{.StructName}}Repo) FindBy(ctx context.Context, key string, value any) (*models.{{.InterfaceName}}, error) {
+	var doc models.{{.InterfaceName}}
+	result := r.db.Where(fmt.Sprintf(`%s=?`, key), value).First(&doc)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return &doc, result.Error
+	}
+	return &doc, nil
+}
+
+func (r *{{.StructName}}Repo) FindAll(ctx context.Context) ([]models.{{.InterfaceName}}, error) {
+	var docs []models.{{.InterfaceName}}
+	result := r.db.Find(docs)
+	if result.Error != nil {
+		logger.Log.Error(result.Error)
+		return docs, result.Error
+	}
+	return docs, nil
+}
+
+func New{{.InterfaceName}}Repo(db *gorm.DB) {{.InterfaceName}}Repo {
+	return &{{.StructName}}Repo{
+		db: db,
+	}
+}

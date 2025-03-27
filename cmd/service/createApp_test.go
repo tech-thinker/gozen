@@ -14,6 +14,7 @@ func Test_appService_CreateApp(t *testing.T) {
 	type fields struct {
 		projectRepo   *repository.MockProjectRepo
 		projectHelper *helpers.MockProjectHelper
+		codeHelper    *helpers.MockCodeHelper
 	}
 	type args struct {
 		project models.Project
@@ -346,6 +347,7 @@ func Test_appService_CreateApp(t *testing.T) {
 			tt.fields = fields{
 				projectRepo:   repository.NewMockProjectRepo(t),
 				projectHelper: helpers.NewMockProjectHelper(t),
+				codeHelper:    helpers.NewMockCodeHelper(t),
 			}
 
 			if tt.prepare != nil {
@@ -355,6 +357,7 @@ func Test_appService_CreateApp(t *testing.T) {
 			cmd := NewAppService(
 				tt.fields.projectRepo,
 				tt.fields.projectHelper,
+				tt.fields.codeHelper,
 			)
 			if err := cmd.CreateApp(tt.args.project); (err != nil) != tt.wantErr {
 				t.Errorf("appService.CreateApp() error = %v, wantErr %v", err, tt.wantErr)

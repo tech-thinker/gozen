@@ -9,7 +9,7 @@ import (
 
 // ServiceRegistry is interface for all service entrypoint
 type ServiceRegistry interface {
-    HealthService() service.HealthSvc
+    HealthSvc() service.HealthSvc
 	// TODO: add service dependency here
 }
 
@@ -18,7 +18,7 @@ type serviceRegistry struct {
 	// TODO: add service dependency here
 }
 
-func (svc *serviceRegistry) HealthService() service.HealthSvc {
+func (svc *serviceRegistry) HealthSvc() service.HealthSvc {
     return svc.healthSvc
 }
 
@@ -27,13 +27,13 @@ func (svc *serviceRegistry) HealthService() service.HealthSvc {
 func Init(cfg config.Configuration, instance instance.Instance) ServiceRegistry {
     // Object init
     db := instance.DB()
-    
+
     // Repository init
     healthRepo := repository.NewHealthRepo(db)
-    
+
     // Service init
     healthSvc := service.NewHealthSvc(healthRepo)
-	
+
     return &serviceRegistry{
         healthSvc: healthSvc,
     }

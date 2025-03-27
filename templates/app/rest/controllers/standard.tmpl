@@ -1,0 +1,181 @@
+package controllers
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"{{.PackageName}}/app"
+	"{{.PackageName}}/models"
+)
+
+// {{.InterfaceName}}Controller is an interface for {{.StructName}} controller
+type {{.InterfaceName}}Controller interface {
+	Route(router *gin.Engine) *gin.RouterGroup
+	Create(ctx *gin.Context)
+	Get(ctx *gin.Context)
+	Update(ctx *gin.Context)
+	Delete(ctx *gin.Context)
+	List(ctx *gin.Context)
+}
+
+type {{.StructName}}Controller struct {
+	svc app.ServiceRegistry
+}
+
+func (c *{{.StructName}}Controller) Route(router *gin.Engine) *gin.RouterGroup {
+	routerGroup := router.Group("/{{.RouteName}}")
+	routerGroup.GET("", c.List)
+	routerGroup.POST("", c.Create)
+	routerGroup.GET("/:id", c.Get)
+	routerGroup.POST("/:id", c.Update)
+	routerGroup.DELETE("/:id", c.Delete)
+	return routerGroup
+}
+
+func (c *{{.StructName}}Controller) Create(ctx *gin.Context) {
+    var req models.{{.InterfaceName}}
+
+	// Bind JSON from request body to struct
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+    res, err := c.svc.{{.InterfaceName}}Svc().Create(ctx, req)
+	if err!=nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Created successfully.",
+		"body": res,
+	})
+}
+
+func (c *{{.StructName}}Controller) Get(ctx *gin.Context) {
+	// Extract the 'id' parameter from the URL path
+	id := ctx.Param("id")
+
+	// Process the ID (e.g., convert it to an integer)
+	docId, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+    res, err := c.svc.{{.InterfaceName}}Svc().Get(ctx, docId)
+	if err!=nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Fetched successfully.",
+		"body": res,
+	})
+}
+
+func (c *{{.StructName}}Controller) Update(ctx *gin.Context) {
+	// Extract the 'id' parameter from the URL path
+	id := ctx.Param("id")
+
+	// Process the ID (e.g., convert it to an integer)
+	docId, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	var req models.{{.InterfaceName}}
+
+	// Bind JSON from request body to struct
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+    res, err := c.svc.{{.InterfaceName}}Svc().Update(ctx, docId, req)
+	if err!=nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Updated successfully.",
+		"body": res,
+	})
+}
+
+func (c *{{.StructName}}Controller) Delete(ctx *gin.Context) {
+	// Extract the 'id' parameter from the URL path
+	id := ctx.Param("id")
+
+	// Process the ID (e.g., convert it to an integer)
+	docId, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+    res, err := c.svc.{{.InterfaceName}}Svc().Delete(ctx, docId)
+	if err!=nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Deleted successfully.",
+		"body": res,
+	})
+}
+
+func (c *{{.StructName}}Controller) List(ctx *gin.Context) {
+    res, err := c.svc.{{.InterfaceName}}Svc().List(ctx)
+	if err!=nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Fetched successfully.",
+		"body": res,
+	})
+}
+
+// New{{.InterfaceName}}Controller initializes {{.StructName}} controller with dependency
+func New{{.InterfaceName}}Controller(svc app.ServiceRegistry) {{.InterfaceName}}Controller {
+	return &{{.StructName}}Controller{
+		svc: svc,
+	}
+}

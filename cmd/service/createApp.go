@@ -8,11 +8,13 @@ import (
 
 type AppService interface {
 	CreateApp(project models.Project) error
+	GenerateModel(doc models.Generator) error
 }
 
 type appService struct {
 	projectRepo   repository.ProjectRepo
 	projectHelper helpers.ProjectHelper
+	codeHelper    helpers.CodeHelper
 }
 
 func (cmd *appService) CreateApp(project models.Project) error {
@@ -88,12 +90,21 @@ func (cmd *appService) CreateApp(project models.Project) error {
 	return nil
 }
 
+func (cmd *appService) GenerateModel(doc models.Generator) error {
+
+	return cmd.codeHelper.GenerateModel(doc)
+
+	// return nil
+}
+
 func NewAppService(
 	projectRepo repository.ProjectRepo,
 	projectHelper helpers.ProjectHelper,
+	codeHelper helpers.CodeHelper,
 ) AppService {
 	return &appService{
 		projectRepo:   projectRepo,
 		projectHelper: projectHelper,
+		codeHelper:    codeHelper,
 	}
 }
