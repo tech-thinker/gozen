@@ -42,8 +42,6 @@ func (h *projectHelper) SetupEnv(project models.Project) error {
 	fileConfigs := []models.FileConfig{
 		{TemplatePath: "templates/env.sample.tmpl", Destination: "/.env"},
 		{TemplatePath: "templates/env.sample.tmpl", Destination: "/.env.sample"},
-		{TemplatePath: "templates/env.sample.tmpl", Destination: "/docker/.env"},
-		{TemplatePath: "templates/env.sample.tmpl", Destination: "/docker/.env.sample"},
 	}
 
 	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
@@ -53,11 +51,11 @@ func (h *projectHelper) SetupDocker(project models.Project) error {
 	fileConfigs := []models.FileConfig{
 		{TemplatePath: "templates/docker/Dockerfile.debug", Destination: "/docker/Dockerfile.debug"},
 		{TemplatePath: "templates/docker/Dockerfile.dev", Destination: "/docker/Dockerfile.dev"},
-		{TemplatePath: "templates/docker/Dockerfile.prod", Destination: "/docker/Dockerfile.prod"},
-		{TemplatePath: "templates/docker/docker-compose-debug.yml", Destination: "/docker/docker-compose-debug.yml"},
-		{TemplatePath: "templates/docker/docker-compose.yml", Destination: "/docker/docker-compose.yml"},
 		{TemplatePath: "templates/docker/modd-debug.conf", Destination: "/docker/modd-debug.conf"},
 		{TemplatePath: "templates/docker/modd-dev.conf", Destination: "/docker/modd-dev.conf"},
+		{TemplatePath: "templates/docker/Dockerfile.prod", Destination: "Dockerfile"},
+		{TemplatePath: "templates/docker-compose-debug.yml.tmpl", Destination: "/docker-compose-debug.yml"},
+		{TemplatePath: "templates/docker-compose.yml.tmpl", Destination: "/docker-compose.yml"},
 	}
 
 	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)

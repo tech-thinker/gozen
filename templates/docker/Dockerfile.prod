@@ -1,5 +1,5 @@
 # Builder stage
-FROM golang:1.22 as builder
+FROM golang:1.22 AS builder
 
 WORKDIR /src
 ADD . .
@@ -9,6 +9,7 @@ RUN go build -o app .
 FROM alpine:edge
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache tzdata
+RUN apk add --no-cache iputils-ping
 RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /src/app /app/app

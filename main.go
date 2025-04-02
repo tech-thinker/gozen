@@ -34,8 +34,9 @@ func main() {
 	projectRepo := repository.NewProjectRepo(fileSystemWrapper)
 
 	projectHelper := helpers.NewProjectHelper(systemRepo)
+	codeHelper := helpers.NewCodeHelper(systemRepo)
 
-	appSvc := service.NewAppService(projectRepo, projectHelper)
+	appSvc := service.NewAppService(projectRepo, projectHelper, codeHelper)
 	app := cmd.NewApp(appSvc)
 
 	cliApp := cli.NewApp()
@@ -43,6 +44,7 @@ func main() {
 	cliApp.Version = AppVersion
 	cliApp.Commands = []*cli.Command{
 		app.CreateProject(),
+		app.GenerateModel(),
 	}
 	if err := cliApp.Run(os.Args); err != nil {
 		fmt.Println(err)

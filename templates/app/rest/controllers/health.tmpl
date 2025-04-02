@@ -9,6 +9,7 @@ import (
 
 // HealthController is an interface for health controller
 type HealthController interface {
+	Route(router *gin.Engine) *gin.RouterGroup
 	Ping(ctx *gin.Context)
 }
 
@@ -16,8 +17,14 @@ type healthController struct {
 	svc app.ServiceRegistry
 }
 
+func (c *healthController) Route(router *gin.Engine) *gin.RouterGroup {
+	routerGroup := router.Group("/ping")
+	routerGroup.GET("", c.Ping)
+	return routerGroup
+}
+
 func (c *healthController) Ping(ctx *gin.Context) {
-    res, err := c.svc.HealthService().Ping(ctx)
+    res, err := c.svc.HealthSvc().Ping(ctx)
 	if err!=nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"success": false,

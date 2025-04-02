@@ -16,7 +16,7 @@ type healthHandler struct {
 
 // Ping implementation for the Health service
 func (s *healthHandler) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PongReply, error) {
-	health, err := s.svc.HealthService().Ping(ctx)
+	health, err := s.svc.HealthSvc().Ping(ctx)
 	if err != nil {
 		logger.Log.Println(err)
 		return &pb.PongReply{

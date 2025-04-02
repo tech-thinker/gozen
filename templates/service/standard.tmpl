@@ -1,0 +1,93 @@
+package service
+
+import (
+	"context"
+
+	"{{.PackageName}}/logger"
+	"{{.PackageName}}/models"
+	"{{.PackageName}}/repository"
+)
+
+type {{.InterfaceName}}Svc interface {
+	Create(ctx context.Context, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error)
+	Get(ctx context.Context, id int) (*models.{{.InterfaceName}}, error)
+	Update(ctx context.Context, id int, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error)
+	Delete(ctx context.Context, id int) (*models.{{.InterfaceName}}, error)
+	List(ctx context.Context) ([]models.{{.InterfaceName}}, error)
+}
+
+type {{.StructName}}Svc struct {
+	{{.StructName}}Repo repository.{{.InterfaceName}}Repo
+}
+
+func (svc *{{.StructName}}Svc) Create(ctx context.Context, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error) {
+
+	id, err := svc.{{.StructName}}Repo.Insert(ctx, doc)
+
+	if err != nil {
+		logger.Log.Error(err)
+		return nil, err
+	}
+
+	doc.ID=id
+
+	return &doc, nil
+}
+
+func (svc *{{.StructName}}Svc) Get(ctx context.Context, id int) (*models.{{.InterfaceName}}, error) {
+
+	doc, err :=  svc.{{.StructName}}Repo.FindByID(ctx, uint(id))
+
+	if err != nil {
+		logger.Log.Error(err)
+		return nil, err
+	}
+
+	return doc, nil
+}
+
+func (svc *{{.StructName}}Svc) Update(ctx context.Context, id int, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error) {
+	doc.ID=uint(id)
+
+	_, err := svc.{{.StructName}}Repo.UpdateAll(ctx, doc)
+	if err != nil {
+		logger.Log.Error(err)
+		return nil, err
+	}
+
+	return &doc, nil
+}
+
+func (svc *{{.StructName}}Svc) Delete(ctx context.Context, id int) (*models.{{.InterfaceName}}, error) {
+	doc := models.{{.InterfaceName}}{
+		ID: uint(id),
+	}
+
+	_, err := svc.{{.StructName}}Repo.Delete(ctx, doc)
+
+	if err != nil {
+		logger.Log.Error(err)
+		return nil, err
+	}
+
+	return &doc, nil
+}
+
+func (svc *{{.StructName}}Svc) List(ctx context.Context) ([]models.{{.InterfaceName}}, error) {
+
+	docs, err := svc.{{.StructName}}Repo.FindAll(ctx)
+	if err != nil {
+		logger.Log.Error(err)
+		return nil, err
+	}
+
+	return docs, nil
+}
+
+func New{{.InterfaceName}}Svc(
+	{{.StructName}}Repo repository.{{.InterfaceName}}Repo,
+) {{.InterfaceName}}Svc {
+	return &{{.StructName}}Svc{
+		{{.StructName}}Repo: {{.StructName}}Repo,
+	}
+}

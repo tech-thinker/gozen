@@ -1,0 +1,22 @@
+version: "3"
+services:
+  {{.AppName}}:
+    container_name: {{.AppName}}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.debug
+    networks:
+      - {{.AppName}}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    security_opt:
+      - seccomp:unconfined
+    env_file: .env
+    ports:
+      - "2345:2345"
+      - "3000:3000"
+    volumes:
+      - "./:/app"
+
+networks:
+  {{.AppName}}
