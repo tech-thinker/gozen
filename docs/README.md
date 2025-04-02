@@ -3,36 +3,57 @@
 ## Project Directory Structure
 ```
 .
-├── Makefile
+├── .editorconfig
+├── .env
+├── .env.sample
+├── .gitignore
 ├── app
-│   ├── controllers
-│   │   └── health.go
-│   ├── initializer
-│   │   └── service.go
-│   └── router
-│       └── router.go
+│   ├── grpc
+│   │   ├── handlers
+│   │   │   └── health.go
+│   │   ├── proto
+│   │   │   ├── health_grpc.pb.go
+│   │   │   ├── health.pb.go
+│   │   │   └── health.proto
+│   │   └── router
+│   │       └── router.go
+│   ├── init.go
+│   └── rest
+│       ├── controllers
+│       │   └── health.go
+│       └── router
+│           └── router.go
 ├── config
-│   └── config.go
+│   └── config.go
 ├── constants
-│   └── app.go
+│   └── app.go
+├── docker
+│   ├── Dockerfile.debug
+│   ├── Dockerfile.dev
+│   ├── modd-debug.conf
+│   └── modd-dev.conf
+├── docker-compose-debug.yml
+├── docker-compose.yml
+├── Dockerfile
 ├── go.mod
-├── go.sum
 ├── gozen.json
 ├── instance
-│   ├── instance.go
-│   └── registry
-│       └── models.go
+│   ├── instance.go
+│   └── registry
+│       └── models.go
 ├── logger
-│   └── logger.go
+│   └── logger.go
 ├── main.go
+├── Makefile
 ├── models
-│   └── health.go
+│   └── health.go
 ├── repository
-│   └── health.go
+│   └── health.go
 ├── runner
-│   └── api.go
+│   ├── api.go
+│   └── grpc.go
 ├── service
-│   └── health.go
+│   └── health.go
 └── utils
     └── utils.go
 ```
@@ -67,11 +88,11 @@
 |   Router  |                                |    Controllers    |
 |           |<-------------------------------+                   |
 +-----------+                                +-------------+-----+
-                                                     ^     |      
-                                                     |     |      
-                                                     |     |      
-                                                     |     |      
-                                                     |     v      
+                                                     ^     |
+                                                     |     |
+                                                     |     |
+                                                     |     |
+                                                     |     v
 +------------------+                           +-----+-----------+
 |                  +-------------------------->|                 |
 |    Repository    |                           |     Service     |
