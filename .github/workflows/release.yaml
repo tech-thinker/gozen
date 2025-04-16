@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   build:
@@ -14,51 +14,51 @@ jobs:
         go-version: [1.22]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: Set Release Version
-      id: set_release_version
-      run: |
-        echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Set Release Version
+        id: set_release_version
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-    - name: Install dependencies
-      run: make setup
+      - name: Install dependencies
+        run: make setup
 
-    - name: Build
-      run: |
-        export AppVersion="${{ env.RELEASE_VERSION }}"
-        echo "Building version: $AppVersion"
-        make dist
+      - name: Build
+        run: |
+          export AppVersion="${{ env.RELEASE_VERSION }}"
+          echo "Building version: $AppVersion"
+          make dist
 
-    - name: Archive build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build
-        path: build
-        if-no-files-found: error
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: build
+          path: build
+          if-no-files-found: error
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build
-        path: build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.2.1
+        with:
+          name: build
+          path: build
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ./build/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./build/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
