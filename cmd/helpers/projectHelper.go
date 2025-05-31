@@ -28,6 +28,7 @@ func (h *projectHelper) InitProject(project models.Project) error {
 	fileConfigs := []models.FileConfig{
 		{TemplatePath: "templates/gitignore.tmpl", Destination: "/.gitignore"},
 		{TemplatePath: "templates/Makefile.tmpl", Destination: "/Makefile"},
+		{TemplatePath: "templates/README.md", Destination: "/README.md"},
 		{TemplatePath: "templates/go.tmpl", Destination: "/go.mod"},
 		{TemplatePath: "templates/main.tmpl", Destination: "/main.go"},
 		{TemplatePath: "templates/editorconfig.tmpl", Destination: "/.editorconfig"},
