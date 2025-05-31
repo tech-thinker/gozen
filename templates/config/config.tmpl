@@ -5,6 +5,7 @@ import "github.com/spf13/viper"
 type Configuration interface {
 	Version() string
 	AppName() string
+	AppEnv() string
 	APIPort() string
 	GrpcPort() string
 
@@ -18,6 +19,7 @@ type Configuration interface {
 type configuration struct {
 	version string
 	appName string
+	appEnv string
 	apiPort string
 	grpcPort string
 
@@ -37,6 +39,11 @@ func (cfg *configuration) Version() string {
 // AppName returns AppName
 func (cfg *configuration) AppName() string {
 	return cfg.appName
+}
+
+// AppEnv returns AppEnv
+func (cfg *configuration) AppEnv() string {
+	return cfg.appEnv
 }
 
 // APIPort returns port
@@ -87,10 +94,11 @@ func Init(
 
 	env.AutomaticEnv()
 	config.version = env.GetString("version")
-	config.apiPort = env.GetString("app_name")
+	config.appName = env.GetString("app_name")
+	config.appEnv = env.GetString("app_env")
 	config.apiPort = env.GetString("api_port")
 	config.grpcPort = env.GetString("grpc_port")
-	
+
 	config.db_driver = env.GetString("db_driver")
 	config.db_host = env.GetString("db_host")
 	config.db_port = env.GetString("db_port")

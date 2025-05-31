@@ -12,8 +12,10 @@ import (
 	"{{.PackageName}}/app"
 	"{{.PackageName}}/app/grpc/router"
 	"{{.PackageName}}/config"
+	"{{.PackageName}}/constants"
 	"{{.PackageName}}/instance"
 	"{{.PackageName}}/logger"
+	"google.golang.org/grpc/reflection"
 )
 
 // GrpcRunner is the interface for rest grpcRunner runner
@@ -39,6 +41,9 @@ func (runner *grpcRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 	}
 
 	routerV1 := router.Init(svc)
+	if runner.cfg.AppEnv() == constants.APP_ENV_DEVELOPMENT {
+		reflection.Register(routerV1)
+	}
 
 	// Channel to listen for interrupt signals
 	stopChan := make(chan os.Signal, 1)
