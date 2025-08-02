@@ -74,6 +74,7 @@ clean:
 
 generate-mocks:
 	# Mockery version v2.50.0
+	# It will work for below version v3
 	# Wrapper
 	@mockery --name=ShellWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=shellWrapper_mock.go --structname=MockShellWrapper
 	@mockery --name=FileSystemWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=fileSystemWrapper_mock.go --structname=MockFileSystemWrapper
