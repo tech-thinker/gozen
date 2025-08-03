@@ -1,0 +1,29 @@
+all: false
+dir: "{{.InterfaceDir}}"
+filename: "{{.InterfaceName}}_mock.go"
+force-file-write: true
+formatter: goimports
+include-auto-generated: false
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "{{.SrcPackageName}}"
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: "{{.Template}}.schema.json"
+packages:
+  github.com/tech-thinker/gozen:
+    config:
+      all: true
+  github.com/tech-thinker/gozen/cmd/repository:
+    interfaces:
+      ProjectRepo:
+      SystemRepo:
+  github.com/tech-thinker/gozen/cmd/helpers:
+    interfaces:
+      CodeHelper:
+      ProjectHelper:
+  github.com/tech-thinker/gozen/wrappers:
+    interfaces:
+      FileSystemWrapper:
+      ShellWrapper:
