@@ -231,7 +231,7 @@ func Test_projectHelper_SetupUtils(t *testing.T) {
 			name:   "if WriteAll success should success",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			},
 			args: args{
 				project: models.Project{
@@ -247,7 +247,7 @@ func Test_projectHelper_SetupUtils(t *testing.T) {
 			name:   "if WriteAll fail should fail",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
 			},
 			args: args{
 				project: models.Project{
@@ -298,7 +298,7 @@ func Test_projectHelper_SetupRepository(t *testing.T) {
 			name:   "if WriteAll success should success",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			},
 			args: args{
 				project: models.Project{
@@ -314,7 +314,7 @@ func Test_projectHelper_SetupRepository(t *testing.T) {
 			name:   "if WriteAll fail should fail",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
 			},
 			args: args{
 				project: models.Project{
@@ -481,6 +481,73 @@ func Test_projectHelper_SetupModel(t *testing.T) {
 	}
 }
 
+func Test_projectHelper_SetupProfiler(t *testing.T) {
+	type fields struct {
+		systemRepo *repository.MockSystemRepo
+	}
+	type args struct {
+		project models.Project
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		prepare func(f *fields)
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "if WriteAll success should success",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			},
+			args: args{
+				project: models.Project{
+					AppName:     "test",
+					PackageName: "test",
+					Driver:      "postgres",
+					WorkingDir:  ".",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "if WriteAll fail should fail",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
+			},
+			args: args{
+				project: models.Project{
+					AppName:     "test",
+					PackageName: "test",
+					Driver:      "postgres",
+					WorkingDir:  ".",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			tt.fields = fields{
+				systemRepo: repository.NewMockSystemRepo(t),
+			}
+
+			if tt.prepare != nil {
+				tt.prepare(&tt.fields)
+			}
+
+			h := NewProjectHelper(tt.fields.systemRepo)
+
+			if err := h.SetupProfiler(tt.args.project); (err != nil) != tt.wantErr {
+				t.Errorf("projectHelper.SetupProfiler() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_projectHelper_SetupLogger(t *testing.T) {
 	type fields struct {
 		systemRepo *repository.MockSystemRepo
@@ -499,7 +566,7 @@ func Test_projectHelper_SetupLogger(t *testing.T) {
 			name:   "if WriteAll success should success",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			},
 			args: args{
 				project: models.Project{
@@ -515,7 +582,7 @@ func Test_projectHelper_SetupLogger(t *testing.T) {
 			name:   "if WriteAll fail should fail",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
 			},
 			args: args{
 				project: models.Project{
@@ -633,7 +700,7 @@ func Test_projectHelper_SetupConstants(t *testing.T) {
 			name:   "if WriteAll success should success",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			},
 			args: args{
 				project: models.Project{
@@ -649,7 +716,7 @@ func Test_projectHelper_SetupConstants(t *testing.T) {
 			name:   "if WriteAll fail should fail",
 			fields: fields{},
 			prepare: func(f *fields) {
-				f.systemRepo.On("Write", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
+				f.systemRepo.On("WriteAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New(`error`))
 			},
 			args: args{
 				project: models.Project{

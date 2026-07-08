@@ -3,46 +3,44 @@ package controllers
 import (
 	"net/http"
 
-	"{{.PackageName}}/app"
 	"github.com/gin-gonic/gin"
+	"{{.PackageName}}/app"
+	"{{.PackageName}}/instance/registry"
 )
 
 // HealthController is an interface for health controller
-type HealthController interface {
-	Route(router *gin.Engine) *gin.RouterGroup
-	Ping(ctx *gin.Context)
-}
-
-type healthController struct {
+type HealthController struct {
 	svc app.ServiceRegistry
 }
 
-func (c *healthController) Route(router *gin.Engine) *gin.RouterGroup {
-	routerGroup := router.Group("/ping")
-	routerGroup.GET("", c.Ping)
+func (c *HealthController) Setup(svc app.ServiceRegistry) {
+	c.svc = svc
+}
+
+func (c *HealthController) Route(router *gin.Engine) *gin.RouterGroup {
+	routerGroup := router.Group("/")
+	routerGroup.GET("/ping", c.Ping)
 	return routerGroup
 }
 
-func (c *healthController) Ping(ctx *gin.Context) {
-    res, err := c.svc.HealthSvc().Ping(ctx)
-	if err!=nil {
+func (c *HealthController) Ping(ctx *gin.Context) {
+	res, err := c.svc.HealthSvc().Ping(ctx.Request.Context())
+
+	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
+			"success":    false,
+			"message":    err.Error(),
 			"heart_beat": 0,
 		})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"success": res.Success,
-		"message": res.Message,
+		"success":    res.Success,
+		"message":    res.Message,
 		"heart_beat": res.HeartBeat,
 	})
 }
 
-// NewHealthController initializes health controller with dependency
-func NewHealthController(svc app.ServiceRegistry) HealthController {
-	return &healthController{
-		svc: svc,
-	}
+func init() {
+	registry.RegisterController(new(HealthController))
 }

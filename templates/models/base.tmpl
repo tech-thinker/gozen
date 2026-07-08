@@ -1,0 +1,24 @@
+package models
+
+import (
+	"{{.PackageName}}/errors"
+)
+
+type APIRes[T any] struct {
+	Success    bool             `json:"success"`
+	Data       *T               `json:"data,omitempty"`
+	Pagination *Pagination      `json:"pagination,omitempty"`
+	Error      *errors.AppError `json:"error,omitempty"`
+}
+
+type Pagination struct {
+	Page       int64 `json:"page"`
+	Limit      int64 `json:"limit"`
+	Total      int64 `json:"total"`
+	TotalPages int64 `json:"total_pages"`
+}
+
+type PaginationQ struct {
+	Offset int64 `json:"offset"`
+	Limit  int64 `json:"limit"`
+}

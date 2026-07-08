@@ -1,13 +1,18 @@
 package instance
 
 import (
+	"context"
 	"fmt"
+	"log"
+
+	"go.opentelemetry.io/otel/sdk/trace"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"log"
 
+	"github.com/kernelshard/otelkit"
+	"github.com/kernelshard/otelkit/tracer"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/constants"
 	"{{.PackageName}}/instance/registry"
@@ -16,25 +21,32 @@ import (
 type Instance interface {
 	Destroy() error
 	DB() *gorm.DB
+	Tracer() *tracer.Tracer
 }
 
-type instance struct {
-	db *gorm.DB
+type singleton struct {
+	db           *gorm.DB
+	otelProvider *trace.TracerProvider
+	tracer       *tracer.Tracer
 	// TODO: define singleton object here
 }
 
 // Destroy closes the connections & cleans up the instance
-func (instance *instance) Destroy() error {
+func (instance *singleton) Destroy() error {
 	return nil
 }
 
-func (instance *instance) DB() *gorm.DB {
+func (instance *singleton) DB() *gorm.DB {
 	return instance.db
+}
+
+func (instance *singleton) Tracer() *tracer.Tracer {
+	return instance.tracer
 }
 
 // Init initializes the instance
 func Init(cfg config.Configuration) Instance {
-	instance := &instance{}
+	singleton := &singleton{}
 
 	var conn gorm.Dialector
 	if cfg.DbDriver() == constants.DbDriverMySQL {
@@ -53,10 +65,23 @@ func Init(cfg config.Configuration) Instance {
 		log.Fatal(err)
 	}
 
-	instance.db = gormDB
-	registry.LoadModels(instance.db)
+	singleton.db = gormDB
+	registry.LoadModels(singleton.db)
+
+	// otelkit
+	config := otelkit.NewProviderConfig(
+		cfg.AppName(),
+		cfg.Version(),
+	).WithOTLPExporter(
+		cfg.OtelExpoterUrl(),
+		cfg.OtelProtocol(),
+		true,
+	).WithSampling("probabilistic", 1.0)
+
+	singleton.otelProvider, err = otelkit.NewProvider(context.Background(), config)
+	singleton.tracer = otelkit.New(cfg.AppName())
 
 	// TODO: initialize singleton object here
 
-	return instance
+	return singleton
 }

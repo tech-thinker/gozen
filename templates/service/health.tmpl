@@ -22,7 +22,7 @@ func (svc *healthSvc) Ping(ctx context.Context) (*models.Health, error) {
 	status, err := svc.healthRepo.Ping(ctx)
 
 	if err != nil {
-		logger.Log.Error(err)
+		logger.Error(err.Error())
 		return nil, err
 	}
 

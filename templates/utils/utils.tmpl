@@ -1,9 +1,21 @@
 package utils
 
-import "time"
+import (
+	"strings"
+	"time"
 
+	"github.com/google/uuid"
+)
+
+// EpochTime return the Unix epoch time
 func EpochTime() int64 {
 	return time.Now().Unix()
+}
+
+// GetUUID returns requiest id
+func GetUUIDString() string {
+	uuid := uuid.New().String()
+	return strings.ReplaceAll(uuid, "-", "")
 }
 
 // TODO: Write utility functions here.

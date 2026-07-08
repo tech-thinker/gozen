@@ -18,12 +18,12 @@ type healthHandler struct {
 func (s *healthHandler) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PongReply, error) {
 	health, err := s.svc.HealthSvc().Ping(ctx)
 	if err != nil {
-		logger.Log.Println(err)
+		logger.Info(err.Error())
 		return &pb.PongReply{
 			Message: err.Error(),
 		}, err
 	}
-	logger.Log.Printf("Received Ping request")
+	logger.Info("Received Ping request")
 	return &pb.PongReply{
 		HeartBeat: health.HeartBeat,
 		Message:   health.Message,

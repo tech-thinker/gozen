@@ -38,6 +38,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupService", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupUtils", mock.Anything).Return(nil)
@@ -222,6 +223,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(errors.New(`error`))
 			},
 			args: args{
@@ -246,6 +248,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupService", mock.Anything).Return(errors.New(`error`))
 			},
@@ -271,6 +274,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupService", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupUtils", mock.Anything).Return(errors.New(`error`))
@@ -297,6 +301,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupService", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupUtils", mock.Anything).Return(nil)
@@ -324,6 +329,7 @@ func Test_appService_CreateApp(t *testing.T) {
 				f.projectHelper.On("SetupConstants", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupLogger", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupModel", mock.Anything).Return(nil)
+				f.projectHelper.On("SetupProfiler", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupRepository", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupService", mock.Anything).Return(nil)
 				f.projectHelper.On("SetupUtils", mock.Anything).Return(nil)

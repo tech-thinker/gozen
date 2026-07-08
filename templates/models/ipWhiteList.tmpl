@@ -1,0 +1,40 @@
+package models
+
+import "{{.PackageName}}/instance/registry"
+
+type IPWhiteList struct {
+	ID         int64  `json:"id"`
+	CustomerId string `json:"customerId"`
+	IPAddress  string `json:"ipAddress"`
+	CreatedBy  string `json:"createdBy"`
+	IsDeleted  *bool  `json:"isDeleted" gorm:"default:false"`
+	CreatedAt  int64  `json:"createdAt" gorm:"autoCreateTime"`
+	UpdatedAt  int64  `json:"updatedAt" gorm:"autoUpdateTime"`
+}
+
+func (d IPWhiteList) Deleted() bool {
+	if d.IsDeleted == nil {
+		return false
+	}
+	return *d.IsDeleted
+}
+
+func init() {
+	registry.RegisterModel(new(IPWhiteList))
+}
+
+type IPWhiteListQuery struct {
+	ID         int64        `json:"id"`
+	CustomerId string       `json:"customerId"`
+	IPAddress  string       `json:"ipAddress"`
+	CreatedBy  string       `json:"createdBy"`
+	IsDeleted  *bool        `json:"isDeleted" gorm:"default:false"`
+	Pagination *PaginationQ `json:"paginationQ"`
+}
+
+type IPWhiteListUpdateParams struct {
+	CustomerId string `json:"customerId"`
+	IPAddress  string `json:"ipAddress"`
+	CreatedBy  string `json:"createdBy"`
+	IsDeleted  *bool  `json:"isDeleted" gorm:"default:false"`
+}

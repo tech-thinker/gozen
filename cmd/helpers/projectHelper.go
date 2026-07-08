@@ -13,6 +13,7 @@ type ProjectHelper interface {
 	SetupRepository(project models.Project) error
 	SetupService(project models.Project) error
 	SetupModel(project models.Project) error
+	SetupProfiler(project models.Project) error
 	SetupLogger(project models.Project) error
 	SetupConfig(project models.Project) error
 	SetupConstants(project models.Project) error
@@ -63,11 +64,20 @@ func (h *projectHelper) SetupDocker(project models.Project) error {
 }
 
 func (h *projectHelper) SetupUtils(project models.Project) error {
-	return h.systemRepo.Write(project.GetAppDir(), "templates/utils/utils.tmpl", "/utils/utils.go", project)
+	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/utils/utils.tmpl", Destination: "/utils/utils.go"},
+		{TemplatePath: "templates/utils/banner.tmpl", Destination: "/utils/banner.go"},
+		{TemplatePath: "templates/utils/tracing.tmpl", Destination: "/utils/tracing.go"},
+	}
+	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
 }
 
 func (h *projectHelper) SetupRepository(project models.Project) error {
-	return h.systemRepo.Write(project.GetAppDir(), "templates/repository/health.tmpl", "/repository/health.go", project)
+	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/repository/health.tmpl", Destination: "/repository/health.go"},
+		{TemplatePath: "templates/repository/ipWhiteList.tmpl", Destination: "/repository/ipWhiteList.go"},
+	}
+	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
 }
 
 func (h *projectHelper) SetupService(project models.Project) error {
@@ -77,14 +87,30 @@ func (h *projectHelper) SetupService(project models.Project) error {
 func (h *projectHelper) SetupModel(project models.Project) error {
 	fileConfigs := []models.FileConfig{
 		{TemplatePath: "templates/instance/registry/models.tmpl", Destination: "/instance/registry/models.go"},
+		{TemplatePath: "templates/models/base.tmpl", Destination: "/models/base.go"},
 		{TemplatePath: "templates/models/health.tmpl", Destination: "/models/health.go"},
+		{TemplatePath: "templates/models/ipWhiteList.tmpl", Destination: "/models/ipWhiteList.go"},
 	}
 
 	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
 }
 
+func (h *projectHelper) SetupProfiler(project models.Project) error {
+	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/profiler/profiler.tmpl", Destination: "/profiler/profiler.go"},
+	}
+	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
+}
+
 func (h *projectHelper) SetupLogger(project models.Project) error {
-	return h.systemRepo.Write(project.GetAppDir(), "templates/logger/logger.tmpl", "/logger/logger.go", project)
+	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/logger/logger.tmpl", Destination: "/logger/logger.go"},
+		{TemplatePath: "templates/errorslug/errorslug.tmpl", Destination: "/errorslug/errorslug.go"},
+		{TemplatePath: "templates/errors/errors.tmpl", Destination: "/errors/errors.go"},
+		{TemplatePath: "templates/errors/generic.tmpl", Destination: "/errors/generic.go"},
+		{TemplatePath: "templates/errors/status.tmpl", Destination: "/errors/status.go"},
+	}
+	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
 }
 
 func (h *projectHelper) SetupConfig(project models.Project) error {
@@ -92,12 +118,19 @@ func (h *projectHelper) SetupConfig(project models.Project) error {
 }
 
 func (h *projectHelper) SetupConstants(project models.Project) error {
-	return h.systemRepo.Write(project.GetAppDir(), "templates/constants/app.tmpl", "/constants/app.go", project)
+	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/constants/app.tmpl", Destination: "/constants/app.go"},
+		{TemplatePath: "templates/constants/context.tmpl", Destination: "/constants/context.go"},
+	}
+	return h.systemRepo.WriteAll(project.GetAppDir(), fileConfigs, project)
 }
 
 func (h *projectHelper) CreateRestAPI(project models.Project) error {
 	fileConfigs := []models.FileConfig{
+		{TemplatePath: "templates/instance/registry/controllers.tmpl", Destination: "/instance/registry/controllers.go"},
+		{TemplatePath: "templates/app/rest/controllers/base.tmpl", Destination: "/app/rest/controllers/base.go"},
 		{TemplatePath: "templates/app/rest/controllers/health.tmpl", Destination: "/app/rest/controllers/health.go"},
+		{TemplatePath: "templates/app/rest/middlewares/middleware.tmpl", Destination: "/app/rest/middlewares/middleware.go"},
 		{TemplatePath: "templates/app/rest/router/router.tmpl", Destination: "/app/rest/router/router.go"},
 		{TemplatePath: "templates/runner/api.tmpl", Destination: "/runner/api.go"},
 	}

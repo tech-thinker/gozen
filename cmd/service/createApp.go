@@ -60,6 +60,11 @@ func (cmd *appService) CreateApp(project models.Project) error {
 	if err != nil {
 		return err
 	}
+	// Profiler
+	err = cmd.projectHelper.SetupProfiler(project)
+	if err != nil {
+		return err
+	}
 	// Repository
 	err = cmd.projectHelper.SetupRepository(project)
 	if err != nil {

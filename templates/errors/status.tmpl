@@ -1,0 +1,99 @@
+package errors
+
+import "google.golang.org/grpc/codes"
+
+const (
+	Success            = 200
+	Created            = 201
+	NoContent          = 204
+	BadRequest         = 400
+	Unauthorized       = 401
+	Forbidden          = 403
+	NotFound           = 404
+	Conflict           = 409
+	PreconditionFailed = 412
+	TooManyRequest     = 429
+	InternalError      = 500
+	NotImplemented     = 501
+	ServiceUnavailable = 503
+	GatewayTimeout     = 504
+	ExternalError      = 502
+)
+
+var StatusText = map[int]string{
+	Success:            "OK",
+	Created:            "Created",
+	NoContent:          "No Content",
+	BadRequest:         "Bad Request",
+	Unauthorized:       "Unauthorized",
+	Forbidden:          "Forbidden",
+	NotFound:           "Not Found",
+	Conflict:           "Conflict",
+	PreconditionFailed: "Precondition Failed",
+	TooManyRequest:     "Too Many Requests",
+	InternalError:      "Internal Server Error",
+	NotImplemented:     "Not Implemented",
+	ServiceUnavailable: "Service Unavailable",
+	GatewayTimeout:     "Gateway Timeout",
+	ExternalError:      "Bad Gateway",
+}
+
+var HTTPToGRPC = map[int]codes.Code{
+	Success:            codes.OK,
+	Created:            codes.OK, // gRPC uses OK for all 2xx
+	NoContent:          codes.OK, // gRPC uses OK for all 2xx
+	BadRequest:         codes.InvalidArgument,
+	Unauthorized:       codes.Unauthenticated,
+	Forbidden:          codes.PermissionDenied,
+	NotFound:           codes.NotFound,
+	Conflict:           codes.AlreadyExists,
+	PreconditionFailed: codes.FailedPrecondition,
+	TooManyRequest:     codes.ResourceExhausted,
+	InternalError:      codes.Internal,
+	NotImplemented:     codes.Unimplemented,
+	ServiceUnavailable: codes.Unavailable,
+	GatewayTimeout:     codes.DeadlineExceeded,
+	ExternalError:      codes.Unavailable,
+}
+
+func ToGRPC(httpStatus int) codes.Code {
+	if code, ok := HTTPToGRPC[httpStatus]; ok {
+		return code
+	}
+	return codes.Unknown
+}
+
+// GRPCToHTTP maps gRPC codes back to your custom HTTP status constants.
+var GRPCToHTTP = map[codes.Code]int{
+	codes.OK:                 Success,            // 200
+	codes.Canceled:           499,                // Client Closed Request (Common convention)
+	codes.Unknown:            InternalError,      // 500
+	codes.InvalidArgument:    BadRequest,         // 400
+	codes.DeadlineExceeded:   GatewayTimeout,     // 504
+	codes.NotFound:           NotFound,           // 404
+	codes.AlreadyExists:      Conflict,           // 409
+	codes.PermissionDenied:   Forbidden,          // 403
+	codes.ResourceExhausted:  TooManyRequest,     // 429
+	codes.FailedPrecondition: PreconditionFailed, // 412
+	codes.Aborted:            Conflict,           // 409
+	codes.OutOfRange:         BadRequest,         // 400
+	codes.Unimplemented:      NotImplemented,     // 501
+	codes.Internal:           InternalError,      // 500
+	codes.Unavailable:        ServiceUnavailable, // 503
+	codes.DataLoss:           InternalError,      // 500
+	codes.Unauthenticated:    Unauthorized,       // 401
+}
+
+func FromGRPC(grpcCode codes.Code) int {
+	if status, ok := GRPCToHTTP[grpcCode]; ok {
+		return status
+	}
+	return InternalError // Default to 500 for safety
+}
+
+func GetStatusText(code int) string {
+	if text, exists := StatusText[code]; exists {
+		return text
+	}
+	return "Unknown Status Code"
+}

@@ -1,0 +1,11 @@
+package controllers
+
+import (
+	"github.com/gin-gonic/gin"
+	"{{.PackageName}}/app"
+)
+
+type BaseController interface {
+	Route(router *gin.Engine) *gin.RouterGroup
+	Setup(svc app.ServiceRegistry)
+}

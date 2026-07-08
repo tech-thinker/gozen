@@ -1,0 +1,156 @@
+package repository
+
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"{{.PackageName}}/logger"
+	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
+	"gorm.io/gorm"
+)
+
+type IPWhiteListRepo interface {
+	Save(ctx context.Context, doc *models.IPWhiteList) error
+	FindOne(ctx context.Context, query *models.IPWhiteList) (*models.IPWhiteList, error)
+	FindAll(ctx context.Context, query *models.IPWhiteListQuery) ([]*models.IPWhiteList, int64, error)
+	Update(ctx context.Context, id int64, updates *models.IPWhiteListUpdateParams) (*models.IPWhiteList, error)
+	Delete(ctx context.Context, doc *models.IPWhiteList) error
+}
+
+type ipWhiteListRepo struct {
+	db       *gorm.DB
+	profiler profiler.Profiler
+}
+
+func (repo *ipWhiteListRepo) Save(ctx context.Context, doc *models.IPWhiteList) error {
+	ctx, span := repo.profiler.StartSpan(ctx, "IPWhiteListRepo:Save")
+	defer span.End()
+
+	if err := repo.db.WithContext(ctx).Create(doc).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return fmt.Errorf("IPWhiteList already exists.")
+		}
+		logger.ErrorContext(ctx, err.Error())
+		repo.profiler.RecordError(span, err)
+		return err
+	}
+	return nil
+}
+
+func (repo *ipWhiteListRepo) FindOne(ctx context.Context, query *models.IPWhiteList) (*models.IPWhiteList, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "IPWhiteListRepo:FindOne")
+	defer span.End()
+
+	var doc models.IPWhiteList
+
+	filter := make(map[string]any)
+
+	if query.ID > 0 {
+		filter["id"] = query.ID
+	}
+
+	if query.CustomerId != "" {
+		filter["customer_id"] = query.CustomerId
+	}
+
+	if query.IPAddress != "" {
+		filter["ip_address"] = query.IPAddress
+	}
+
+	if query.IsDeleted != nil {
+		filter["is_deleted"] = *query.IsDeleted
+	}
+
+	if err := repo.db.WithContext(ctx).Where(filter).First(&doc).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		logger.ErrorContext(ctx, err.Error())
+		repo.profiler.RecordError(span, err)
+		return nil, err
+	}
+	return &doc, nil
+}
+
+func (repo *ipWhiteListRepo) FindAll(ctx context.Context, query *models.IPWhiteListQuery) ([]*models.IPWhiteList, int64, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "IPWhiteListRepo:FindAll")
+	defer span.End()
+
+	var docs []*models.IPWhiteList
+	var total int64
+
+	filter := repo.db.Model(new(models.IPWhiteList))
+
+	if query.CustomerId != "" {
+		filter = filter.Where("customer_id = ?", query.CustomerId)
+	}
+
+	if query.IPAddress != "" {
+		filter = filter.Where("ip_address = ?", query.IPAddress)
+	}
+
+	if query.IsDeleted != nil {
+		filter = filter.Where("is_deleted = ?", query.IsDeleted)
+	}
+
+	if query.Pagination != nil {
+		if err := filter.Count(&total).Error; err != nil {
+			return nil, 0, err
+		}
+
+		filter = filter.Offset(int(query.Pagination.Offset)).Limit(int(query.Pagination.Limit)).Order("id ASC")
+	}
+
+	if err := filter.Find(&docs).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, total, err
+		}
+		logger.ErrorContext(ctx, err.Error())
+		repo.profiler.RecordError(span, err)
+		return nil, total, err
+	}
+	return docs, total, nil
+}
+
+func (repo *ipWhiteListRepo) Update(ctx context.Context, id int64, updates *models.IPWhiteListUpdateParams) (*models.IPWhiteList, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "IPWhiteListRepo:Update")
+	defer span.End()
+
+	var doc models.IPWhiteList
+
+	if err := repo.db.WithContext(ctx).Model(new(models.IPWhiteList)).Where("id = ?", id).Updates(updates).Error; err != nil {
+		logger.ErrorContext(ctx, err.Error())
+		repo.profiler.RecordError(span, err)
+		return nil, err
+	}
+
+	if err := repo.db.First(&doc, id).Error; err != nil {
+		return nil, err
+	}
+
+	return &doc, nil
+}
+
+func (repo *ipWhiteListRepo) Delete(ctx context.Context, doc *models.IPWhiteList) error {
+	ctx, span := repo.profiler.StartSpan(ctx, "IPWhiteListRepo:Delete")
+	defer span.End()
+
+	if err := repo.db.WithContext(ctx).Delete(doc).Error; err != nil {
+		logger.ErrorContext(ctx, err.Error())
+		repo.profiler.RecordError(span, err)
+		return err
+	}
+	return nil
+}
+
+func NewIPWhiteListRepo(
+	db *gorm.DB,
+	profiler profiler.Profiler,
+) IPWhiteListRepo {
+	return &ipWhiteListRepo{
+		db:       db,
+		profiler: profiler,
+	}
+}

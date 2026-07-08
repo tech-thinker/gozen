@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	"{{.PackageName}}/app"
@@ -33,7 +34,7 @@ func (runner *apiRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 
 	svc := app.Init(runner.cfg, runner.instance)
 
-	routerV1 := router.Init(svc)
+	routerV1 := router.Init(svc, runner.cfg)
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%s", runner.cfg.APIPort()),
 		Handler:      routerV1,
@@ -43,7 +44,7 @@ func (runner *apiRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 
 	// Channel to listen for interrupt signals
 	stopChan := make(chan os.Signal, 1)
-	signal.Notify(stopChan, os.Interrupt, os.Kill)
+	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		<-stopChan
@@ -61,12 +62,13 @@ func (runner *apiRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 		}
 	}()
 
-	logger.Log.Infof("Starting Rest API server...")
-	logger.Log.Infof("Listening on rest api server: http://127.0.0.1:%s", runner.cfg.APIPort())
-	logger.Log.Infof("Rest API health check URL: http://127.0.0.1:%s/ping", runner.cfg.APIPort())
+	logger.Info("Starting Rest API server...")
+	logger.Info(fmt.Sprintf("CORS Origins: %v", runner.cfg.CORSOrigins()))
+	logger.Info(fmt.Sprintf("Listening on rest api server: http://127.0.0.1:%s", runner.cfg.APIPort()))
+	logger.Info(fmt.Sprintf("Rest API health check URL: http://127.0.0.1:%s/ping", runner.cfg.APIPort()))
 
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Log.Fatal(err)
+		logger.Fatal(err.Error())
 	}
 }
 

@@ -1,13 +1,21 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"strings"
+
+	"github.com/spf13/viper"
+)
 
 type Configuration interface {
 	Version() string
 	AppName() string
 	AppEnv() string
 	APIPort() string
+	CORSOrigins() []string
 	GrpcPort() string
+
+	OtelExpoterUrl() string
+	OtelProtocol() string
 
 	DbDriver() string
 	DbHost() string
@@ -21,7 +29,11 @@ type configuration struct {
 	appName string
 	appEnv string
 	apiPort string
+	corsOrigins string
 	grpcPort string
+
+	otelExpoterUrl string
+	otelProtocol   string
 
 	db_driver string
 	db_host   string
@@ -51,9 +63,27 @@ func (cfg *configuration) APIPort() string {
 	return cfg.apiPort
 }
 
+// CORSOrigins returns CORS origins
+func (cfg *configuration) CORSOrigins() []string {
+	if len(cfg.corsOrigins) == 0 {
+		return []string{"*"}
+	}
+	return strings.Split(cfg.corsOrigins, ",")
+}
+
 // GrpcPort returns port
 func (cfg *configuration) GrpcPort() string {
 	return cfg.grpcPort
+}
+
+// OtelExpoterUrl returns port
+func (cfg *configuration) OtelExpoterUrl() string {
+	return cfg.otelExpoterUrl
+}
+
+// OtelProtocol returns port
+func (cfg *configuration) OtelProtocol() string {
+	return cfg.otelProtocol
 }
 
 // DbDriver returns database driver
@@ -93,17 +123,21 @@ func Init(
 	config := &configuration{}
 
 	env.AutomaticEnv()
-	config.version = env.GetString("version")
-	config.appName = env.GetString("app_name")
-	config.appEnv = env.GetString("app_env")
-	config.apiPort = env.GetString("api_port")
-	config.grpcPort = env.GetString("grpc_port")
+	config.version = env.GetString("VERSION")
+	config.appName = env.GetString("APP_NAME")
+	config.appEnv = env.GetString("APP_ENV")
+	config.apiPort = env.GetString("API_PORT")
+	config.corsOrigins = env.GetString("CORS_ORIGINS")
+	config.grpcPort = env.GetString("GRPC_PORT")
 
-	config.db_driver = env.GetString("db_driver")
-	config.db_host = env.GetString("db_host")
-	config.db_port = env.GetString("db_port")
-	config.db_user = env.GetString("db_user")
-	config.db_pass = env.GetString("db_pass")
-	config.db_name = env.GetString("db_name")
+	config.otelExpoterUrl = env.GetString("OTEL_EXPOTER_URL")
+	config.otelProtocol = env.GetString("OTEL_PROTOCOL")
+
+	config.db_driver = env.GetString("DB_DRIVER")
+	config.db_host = env.GetString("DB_HOST")
+	config.db_port = env.GetString("DB_PORT")
+	config.db_user = env.GetString("DB_USER")
+	config.db_pass = env.GetString("DB_PASS")
+	config.db_name = env.GetString("DB_NAME")
 	return config
 }
