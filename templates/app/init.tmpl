@@ -1,40 +1,64 @@
 package app
 
 import (
+	"{{.PackageName}}/app/rest/middlewares"
 	"{{.PackageName}}/config"
 	"{{.PackageName}}/instance"
+	"{{.PackageName}}/profiler"
 	"{{.PackageName}}/repository"
 	"{{.PackageName}}/service"
 )
 
 // ServiceRegistry is interface for all service entrypoint
 type ServiceRegistry interface {
-    HealthSvc() service.HealthSvc
+	Profiler() profiler.Profiler
+	Middleware() middlewares.Middleware
+	HealthSvc() service.HealthSvc
 	// TODO: add service dependency here
 }
 
 type serviceRegistry struct {
-    healthSvc service.HealthSvc
+	profiler   profiler.Profiler
+	middleware middlewares.Middleware
+	healthSvc  service.HealthSvc
 	// TODO: add service dependency here
 }
 
-func (svc *serviceRegistry) HealthSvc() service.HealthSvc {
-    return svc.healthSvc
+func (svc *serviceRegistry) Profiler() profiler.Profiler {
+	return svc.profiler
 }
 
+func (svc *serviceRegistry) Middleware() middlewares.Middleware {
+	return svc.middleware
+}
+
+func (svc *serviceRegistry) HealthSvc() service.HealthSvc {
+	return svc.healthSvc
+}
 
 // Init initializes serviceRegistry repo
 func Init(cfg config.Configuration, instance instance.Instance) ServiceRegistry {
-    // Object init
-    db := instance.DB()
+	// Object init
+	db := instance.DB()
+	tracer := instance.Tracer()
 
-    // Repository init
-    healthRepo := repository.NewHealthRepo(db)
+	// Profiler init
+	profiler := profiler.NewProfiler(tracer)
 
-    // Service init
-    healthSvc := service.NewHealthSvc(healthRepo)
+	// Repository init
+	ipWhiteListRepo := repository.NewIPWhiteListRepo(db, profiler)
+	healthRepo := repository.NewHealthRepo(db)
 
-    return &serviceRegistry{
-        healthSvc: healthSvc,
-    }
+	// Middleware
+
+	middleware := middlewares.NewMiddleware(cfg, profiler, ipWhiteListRepo)
+
+	// Service init
+	healthSvc := service.NewHealthSvc(healthRepo)
+
+	return &serviceRegistry{
+		profiler:   profiler,
+		middleware: middleware,
+		healthSvc:  healthSvc,
+	}
 }

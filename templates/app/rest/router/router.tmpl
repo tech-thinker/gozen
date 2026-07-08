@@ -1,17 +1,42 @@
 package router
 
 import (
+	"log"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"{{.PackageName}}/app"
 	"{{.PackageName}}/app/rest/controllers"
-	"github.com/gin-gonic/gin"
+	"{{.PackageName}}/config"
+	"{{.PackageName}}/constants"
+	"{{.PackageName}}/instance/registry"
 )
 
 // Init sets router
-func Init(svc app.ServiceRegistry) *gin.Engine {
+func Init(svc app.ServiceRegistry, cfg config.Configuration) *gin.Engine {
+	gin.DefaultWriter = log.Writer()
+	if cfg.AppEnv() == constants.APP_ENV_PRODUCTION {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     cfg.CORSOrigins(), // allow all origins
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Trace-ID", "X-Request-ID", "X-Real-IP", "X-Forwarded-For"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
-	health := controllers.NewHealthController(svc)
-	router.GET("/ping", health.Ping)
+	// router.Use(svc.Middleware().SettingTrackingID())
+
+	for _, controller := range registry.GetControllers() {
+		if ctrl, ok := controller.(controllers.BaseController); ok {
+			ctrl.Setup(svc)
+			ctrl.Route(router)
+		}
+	}
 
 	return router
 }

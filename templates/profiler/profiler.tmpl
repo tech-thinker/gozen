@@ -1,0 +1,158 @@
+package profiler
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/kernelshard/otelkit/tracer"
+	"{{.PackageName}}/constants"
+	"{{.PackageName}}/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+)
+
+type Profiler interface {
+	SetTracer(tracer trace.Tracer)
+	StartSpan(ctx context.Context, name string) (context.Context, trace.Span)
+	GetTracer() *tracer.Tracer
+	RecordError(span trace.Span, err error)
+	RecordSuccess(span trace.Span, message string)
+	AddAttribute(span trace.Span, key string, value any)
+	AddAttributes(span trace.Span, kv map[string]any)
+	AddEvent(span trace.Span, name string, kv map[string]any)
+	IsRecording(span trace.Span) bool
+}
+
+type profiler struct {
+	tracer *tracer.Tracer
+}
+
+func NewProfiler(
+	tracer *tracer.Tracer,
+) Profiler {
+	return &profiler{
+		tracer: tracer,
+	}
+}
+
+func (p *profiler) SetTracer(tracer trace.Tracer) {
+	// p.tracer = tracer
+}
+
+func (p *profiler) StartSpan(ctx context.Context, name string) (context.Context, trace.Span) {
+	ctx, span := p.tracer.Start(ctx, name)
+	trackingId := utils.GetTrackingID(ctx)
+	if len(trackingId) > 0 {
+		p.AddAttribute(span, constants.CONTEXT_TRACKING_ID, trackingId)
+	}
+
+	userInfo, ok := utils.GetUserInfo(ctx)
+	if ok {
+		userId, ok := userInfo[constants.CONSTS_USER_ID]
+		if ok {
+			p.AddAttributes(span, map[string]any{
+				"user.id": userId,
+			})
+		}
+	}
+
+	return ctx, span
+}
+
+func (p *profiler) GetTracer() *tracer.Tracer {
+	return p.tracer
+}
+
+func (p *profiler) RecordError(span trace.Span, err error) {
+	if span == nil {
+		return
+	}
+	tracer.RecordError(span, err)
+}
+
+func (p *profiler) RecordSuccess(span trace.Span, message string) {
+	if span == nil {
+		return
+	}
+	span.SetStatus(codes.Ok, message)
+}
+
+func (p *profiler) AddAttribute(span trace.Span, key string, value any) {
+	if span == nil {
+		return
+	}
+	attr := p.toAttribute(key, value)
+	tracer.AddAttributes(span, attr)
+}
+
+func (p *profiler) AddAttributes(span trace.Span, kv map[string]any) {
+	if span == nil {
+		return
+	}
+
+	var attrs []attribute.KeyValue
+	for k, v := range kv {
+		attr := p.toAttribute(k, v)
+		attrs = append(attrs, attr)
+	}
+	tracer.AddAttributes(span, attrs...)
+}
+
+func (p *profiler) AddEvent(span trace.Span, name string, kv map[string]any) {
+	if span == nil {
+		return
+	}
+
+	var attrs []attribute.KeyValue
+	for k, v := range kv {
+		attr := p.toAttribute(k, v)
+		attrs = append(attrs, attr)
+	}
+	tracer.AddEvent(span, name, attrs...)
+}
+
+func (p *profiler) IsRecording(span trace.Span) bool {
+	if span == nil {
+		return false
+	}
+	return tracer.IsRecording(span)
+}
+
+func (p *profiler) toAttribute(key string, v any) attribute.KeyValue {
+	switch val := v.(type) {
+
+	case string:
+		return attribute.String(key, val)
+
+	case int:
+		return attribute.Int(key, val)
+
+	case int64:
+		return attribute.Int64(key, val)
+
+	case float64:
+		return attribute.Float64(key, val)
+
+	case bool:
+		return attribute.Bool(key, val)
+
+	case []string:
+		return attribute.StringSlice(key, val)
+
+	case []int:
+		return attribute.IntSlice(key, val)
+
+	case []int64:
+		return attribute.Int64Slice(key, val)
+
+	case []bool:
+		return attribute.BoolSlice(key, val)
+
+	case fmt.Stringer:
+		return attribute.String(key, val.String())
+
+	default:
+		return attribute.String(key, fmt.Sprintf("%v", val))
+	}
+}

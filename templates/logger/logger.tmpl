@@ -1,11 +1,161 @@
 package logger
 
-import "github.com/sirupsen/logrus"
+import (
+	"context"
+	"io"
+	"log/slog"
+	"os"
+	"runtime"
+	"sync"
+	"time"
 
-// Log is public object for log handling
-var Log *logrus.Logger
+	"{{.PackageName}}/constants"
+)
 
-func init() {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	Log = logrus.New()
+var (
+	once   sync.Once
+	logger *slog.Logger
+)
+
+const (
+	LevelDebug slog.Level = -4
+	LevelInfo  slog.Level = 0
+	LevelWarn  slog.Level = 4
+	LevelError slog.Level = 8
+)
+
+// ContextHandler wraps a slog.Handler to inject context values into logs
+type ContextHandler struct {
+	slog.Handler
+}
+
+// Handle pulls data from the context and adds it to the log record
+func (h *ContextHandler) Handle(ctx context.Context, r slog.Record) error {
+
+	// Inject Tracking ID
+	if traceID, ok := ctx.Value(constants.CONTEXT_TRACKING_ID).(string); ok {
+		r.AddAttrs(slog.String(constants.CONTEXT_TRACKING_ID, traceID))
+	}
+
+	// Inject Metadata map
+	if metadata, ok := ctx.Value(constants.CONTEXT_METADATA).(map[string]string); ok {
+		for key, value := range metadata {
+			r.AddAttrs(slog.String(key, value))
+		}
+	}
+	return h.Handler.Handle(ctx, r)
+}
+
+func (h *ContextHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &ContextHandler{Handler: h.Handler.WithAttrs(attrs)}
+}
+
+func (h *ContextHandler) WithGroup(name string) slog.Handler {
+	return &ContextHandler{Handler: h.Handler.WithGroup(name)}
+}
+
+type LogConfig struct {
+	ServiceName string
+	LogLevel    slog.Level
+	IsJson      bool
+	AddSource   bool
+	Output      io.Writer
+}
+
+// Setup initializes the logger.
+func Setup(cfg LogConfig) {
+	once.Do(func() {
+		opts := &slog.HandlerOptions{
+			Level:     cfg.LogLevel,
+			AddSource: cfg.AddSource,
+		}
+
+		var baseHandler slog.Handler
+
+		var w io.Writer
+		if cfg.Output != nil {
+			w = cfg.Output
+		} else {
+			w = os.Stdout
+		}
+
+		if cfg.IsJson {
+			baseHandler = slog.NewJSONHandler(w, opts)
+		} else {
+			baseHandler = slog.NewTextHandler(w, opts)
+		}
+
+		handler := &ContextHandler{Handler: baseHandler}
+		logger = slog.New(handler).With(
+			slog.String("service", cfg.ServiceName),
+		)
+
+		slog.SetDefault(logger)
+	})
+}
+
+func Log() *slog.Logger {
+	if logger == nil {
+		return slog.Default()
+	}
+	return logger
+}
+
+func internalLog(ctx context.Context, level slog.Level, msg string, args ...any) {
+	l := Log()
+	if !l.Handler().Enabled(ctx, level) {
+		return
+	}
+
+	var pcs [1]uintptr
+	// Skip 3 frames: [0: runtime.Callers, 1: internalLog, 2: Wrapper (Info/Error), 3: Business Logic]
+	runtime.Callers(3, pcs[:])
+
+	r := slog.NewRecord(time.Now(), level, msg, pcs[0])
+	r.Add(args...)
+	_ = l.Handler().Handle(ctx, r)
+}
+
+// Debug logs at [LevelDebug].
+func Debug(msg string, args ...any) { internalLog(context.Background(), LevelDebug, msg, args...) }
+
+// DebugContext logs at [LevelDebug] with the given context.
+func DebugContext(ctx context.Context, msg string, args ...any) {
+	internalLog(ctx, LevelDebug, msg, args...)
+}
+
+// Info logs at [LevelInfo].
+func Info(msg string, args ...any) { internalLog(context.Background(), LevelInfo, msg, args...) }
+
+// InfoContext logs at [LevelInfo] with the given context.
+func InfoContext(ctx context.Context, msg string, args ...any) {
+	internalLog(ctx, LevelInfo, msg, args...)
+}
+
+// Warn logs at [LevelWarn].
+func Warn(msg string, args ...any) { internalLog(context.Background(), LevelWarn, msg, args...) }
+
+// WarnContext logs at [LevelWarn] with the given context.
+func WarnContext(ctx context.Context, msg string, args ...any) {
+	internalLog(ctx, LevelWarn, msg, args...)
+}
+
+// Error logs at [LevelError].
+func Error(msg string, args ...any) { internalLog(context.Background(), LevelError, msg, args...) }
+
+// ErrorContext logs at [LevelError] with the given context.
+func ErrorContext(ctx context.Context, msg string, args ...any) {
+	internalLog(ctx, LevelError, msg, args...)
+}
+
+// Fatal logs at [LevelError].
+func Fatal(msg string, args ...any) {
+	internalLog(context.Background(), LevelError, msg, args...)
+	os.Exit(1)
+}
+
+// FatalContext logs at [LevelError] with the given context.
+func FatalContext(ctx context.Context, msg string, args ...any) {
+	internalLog(ctx, LevelError, msg, args...)
+	os.Exit(1)
 }

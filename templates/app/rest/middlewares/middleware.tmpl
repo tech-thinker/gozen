@@ -1,0 +1,136 @@
+package middlewares
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"{{.PackageName}}/config"
+	"{{.PackageName}}/constants"
+	"{{.PackageName}}/errors"
+	"{{.PackageName}}/errorslug"
+	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
+	"{{.PackageName}}/repository"
+	"{{.PackageName}}/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
+)
+
+type Middleware interface {
+	SettingTrackingID() gin.HandlerFunc
+	ClientIPValidator() gin.HandlerFunc
+}
+
+type middleware struct {
+	cfg             config.Configuration
+	profiler        profiler.Profiler
+	ipWhiteListRepo repository.IPWhiteListRepo
+}
+
+const (
+	AttrHTTPMethod    = "http.method"
+	AttrHTTPURL       = "http.url"
+	AttrHTTPUserAgent = "http.user_agent"
+)
+
+func (m *middleware) SettingTrackingID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// fmt.Println("ClientIP:", c.ClientIP())
+		// fmt.Println("XFF:", c.GetHeader("X-Forwarded-For"))
+		// fmt.Println("RealIP:", c.GetHeader("X-Real-IP"))
+
+		trackingId := c.Copy().GetHeader(constants.CONTEXT_TRACKING_ID)
+		if len(trackingId) == 0 {
+			trackingId = utils.GetUUIDString()
+		}
+
+		// otelkit setup
+		ctx := c.Request.Context()
+		propagator := otel.GetTextMapPropagator()
+		ctx = propagator.Extract(ctx, propagation.HeaderCarrier(c.Request.Header))
+		spanName := fmt.Sprintf("%s %s", c.Request.Method, c.Request.URL.Path)
+
+		// This is required to share traces accross distributed system
+		otel.SetTextMapPropagator(
+			propagation.NewCompositeTextMapPropagator(
+				propagation.TraceContext{},
+				propagation.Baggage{},
+			),
+		)
+
+		ctx, span := m.profiler.GetTracer().Start(c, spanName, trace.WithSpanKind(
+			trace.SpanKindServer),
+			trace.WithAttributes(
+				attribute.String(AttrHTTPMethod, c.Request.Method),
+				attribute.String(AttrHTTPURL, c.Request.URL.String()),
+				attribute.String(AttrHTTPUserAgent, c.Request.UserAgent()),
+				attribute.String(constants.CONTEXT_TRACKING_ID, trackingId),
+			),
+		)
+		defer span.End()
+		c.Request = c.Request.WithContext(ctx)
+		// // otelkit setup finished
+		requestTime := time.Now().Unix()
+		c.Header(constants.CONTEXT_TRACKING_ID, trackingId)
+		c.Set(constants.CONTEXT_TRACKING_ID, trackingId)
+		c.Set(constants.CONTEXT_REQUEST_TIME, requestTime)
+		c.Next()
+	}
+}
+
+func (m *middleware) ClientIPValidator() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		clientIP := c.ClientIP()
+		xff := c.GetHeader("X-Forwarded-For")
+		realIP := c.GetHeader("X-Real-IP")
+
+		fmt.Println("ClientIP:", clientIP)
+		fmt.Println("XFF:", xff)
+		fmt.Println("RealIP:", realIP)
+
+		ip, err := m.ipWhiteListRepo.FindOne(c.Request.Context(), &models.IPWhiteList{
+			IPAddress: clientIP,
+			IsDeleted: new(false),
+		})
+
+		if err != nil {
+			appErr := errors.New(errors.Forbidden, errorslug.FORBIDDEN, "Your IP is not whitelisted.")
+			res := models.APIRes[any]{
+				Success: false,
+				Error:   appErr,
+			}
+			c.JSON(appErr.Code, res)
+			c.Abort()
+			return
+		}
+
+		if ip == nil {
+			appErr := errors.New(errors.Forbidden, errorslug.FORBIDDEN, "Your IP is not whitelisted.")
+			res := models.APIRes[any]{
+				Success: false,
+				Error:   appErr,
+			}
+			c.JSON(appErr.Code, res)
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func NewMiddleware(
+	cfg config.Configuration,
+	profiler profiler.Profiler,
+	ipWhiteListRepo repository.IPWhiteListRepo,
+) Middleware {
+	return &middleware{
+		cfg:             cfg,
+		profiler:        profiler,
+		ipWhiteListRepo: ipWhiteListRepo,
+	}
+}

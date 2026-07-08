@@ -1,0 +1,130 @@
+package utils
+
+import (
+	"context"
+	"encoding/json"
+
+	"{{.PackageName}}/constants"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"google.golang.org/grpc/metadata"
+)
+
+func GetTrackingID(ctx context.Context) string {
+	val := ctx.Value(constants.CONTEXT_TRACKING_ID)
+	if nil == val {
+		return ""
+	}
+	return val.(string)
+}
+
+func SetTrackingIdToGrpcContext(ctx context.Context) context.Context {
+	trackingID := GetTrackingID(ctx)
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = metadata.Pairs(constants.CONTEXT_TRACKING_ID, trackingID)
+	} else {
+		md = md.Copy()
+		md.Set(constants.CONTEXT_TRACKING_ID, trackingID)
+	}
+	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func GetTrackingIdFromGrpcContext(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+
+	trackingIDs := md.Get(constants.CONTEXT_TRACKING_ID)
+	var trackingID string
+	if len(trackingIDs) > 0 {
+		trackingID = trackingIDs[0]
+	}
+	return trackingID
+}
+
+func SetTokenToGrpcContext(ctx context.Context) context.Context {
+	token := GetToken(ctx)
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = metadata.Pairs("x-token", token)
+	} else {
+		md = md.Copy()
+		md.Set("x-token", token)
+	}
+	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func GetTokenFromGrpcContext(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+	tokens := md.Get("x-token")
+	var token string
+	if len(tokens) > 0 {
+		token = tokens[0]
+	}
+	return token
+}
+
+func GetToken(ctx context.Context) string {
+	val := ctx.Value(constants.CONTEXT_ACCESS_TOKEN)
+	if nil == val {
+		return ""
+	}
+	return val.(string)
+}
+
+// SetMatadataToContext will set metadata object to context
+func SetMatadataToContext(ctx context.Context, metadata map[string]string) context.Context {
+	if metadata == nil {
+		return ctx
+	}
+
+	ctx = context.WithValue(ctx, constants.CONTEXT_METADATA, metadata)
+	return ctx
+}
+
+// GetMatadataFromContext will return metadata object from context
+func GetMatadataFromContext(ctx context.Context) (map[string]string, bool) {
+	var zero map[string]string
+	val := ctx.Value(constants.CONTEXT_METADATA)
+	if nil == val {
+		return zero, false
+	}
+	return val.(map[string]string), true
+}
+
+func GetUserInfo(ctx context.Context) (map[string]string, bool) {
+	var zero map[string]string
+	val := ctx.Value(constants.CONTEXT_USER_INFO)
+	if nil == val {
+		return zero, false
+	}
+	return val.(map[string]string), true
+}
+
+// Parse object logs to string
+func ParseObjectLogToString(obj any) string {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
+// ExtractTraceContext where trace is a carrier
+func ExtractTraceContext(ctx context.Context, trace map[string]string) context.Context {
+	carrier := propagation.MapCarrier(trace)
+	ctx = otel.GetTextMapPropagator().Extract(context.Background(), carrier)
+	return ctx
+}
+
+// ExtractCarrierFromContext
+func ExtractCarrierFromContext(ctx context.Context) propagation.MapCarrier {
+	carrier := propagation.MapCarrier{}
+	otel.GetTextMapPropagator().Inject(ctx, carrier)
+	return carrier
+}

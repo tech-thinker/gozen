@@ -1,0 +1,15 @@
+package registry
+
+var registeredControllers []any
+
+func RegisterController(controller any) {
+	registeredControllers = append(registeredControllers, controller)
+}
+
+func GetControllers() []any {
+	return registeredControllers
+}
+
+func init() {
+	registeredControllers = make([]any, 0)
+}

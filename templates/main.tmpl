@@ -5,10 +5,13 @@ import (
 	"os"
 	"sync"
 
-	"{{.PackageName}}/config"
-	"{{.PackageName}}/instance"
-	"{{.PackageName}}/runner"
 	"github.com/spf13/viper"
+	"{{.PackageName}}/config"
+	"{{.PackageName}}/constants"
+	"{{.PackageName}}/instance"
+	"{{.PackageName}}/logger"
+	"{{.PackageName}}/runner"
+	"{{.PackageName}}/utils"
 	"github.com/urfave/cli"
 )
 
@@ -16,8 +19,23 @@ func main() {
 	v := viper.New()
 	cfg := config.Init(v)
 
-	instance := instance.Init(cfg)
+	logLevel := logger.LevelDebug
+	if cfg.AppEnv() == constants.APP_ENV_PRODUCTION {
+		logLevel = logger.LevelInfo
+	}
 
+	logger.Setup(logger.LogConfig{
+		ServiceName: cfg.AppName(),
+		LogLevel:    logLevel,
+		IsJson:      true,
+		AddSource:   true,
+		Output:      os.Stdout,
+	})
+
+	// initializing singleton
+	singleton := instance.Init(cfg)
+
+	// CLI app
 	clientApp := cli.NewApp()
 	clientApp.Name = "{{.AppName}}"
 	clientApp.Version = cfg.Version()
@@ -27,12 +45,41 @@ func main() {
 			Usage: "Start the service",
 			Action: func(c *cli.Context) error {
 				var wg sync.WaitGroup
+				utils.PrintBanner(cfg.AppName(), "API started...\ngRPC started...")
 
 				wg.Add(1)
-				go runner.NewAPI(cfg, instance).Go(context.Background(), &wg)
+				go runner.NewAPI(cfg, singleton).Go(context.Background(), &wg)
 
 				wg.Add(1)
-				go runner.NewGrpc(cfg, instance).Go(context.Background(), &wg)
+				go runner.NewGrpc(cfg, singleton).Go(context.Background(), &wg)
+
+				wg.Wait()
+				return nil
+			},
+		},
+		{
+			Name:  "api",
+			Usage: "Start the API service",
+			Action: func(c *cli.Context) error {
+				var wg sync.WaitGroup
+				utils.PrintBanner(cfg.AppName(), "API started...")
+
+				wg.Add(1)
+				go runner.NewAPI(cfg, singleton).Go(context.Background(), &wg)
+
+				wg.Wait()
+				return nil
+			},
+		},
+		{
+			Name:  "grpc",
+			Usage: "Start the gRPC service",
+			Action: func(c *cli.Context) error {
+				var wg sync.WaitGroup
+				utils.PrintBanner(cfg.AppName(), "gRPC started...")
+
+				wg.Add(1)
+				go runner.NewGrpc(cfg, singleton).Go(context.Background(), &wg)
 
 				wg.Wait()
 				return nil

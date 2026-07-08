@@ -37,7 +37,7 @@ func (runner *grpcRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", runner.cfg.GrpcPort()))
 	if err != nil {
-		logger.Log.Fatalf("Failed to listen: %v", err)
+		logger.Fatal("Failed to listen: %v", err)
 	}
 
 	routerV1 := router.Init(svc)
@@ -65,11 +65,11 @@ func (runner *grpcRunner) Go(ctx context.Context, wg *sync.WaitGroup) {
 		}
 	}()
 
-	logger.Log.Infof("Starting gRPC api server...")
-	logger.Log.Infof("Listening on gRPC server: http://127.0.0.1:%s", runner.cfg.GrpcPort())
-	logger.Log.Infof("gRPC health method: /Health/ping")
+	logger.Info("Starting gRPC api server...")
+	logger.Info(fmt.Sprintf("Listening on gRPC server: http://127.0.0.1:%s", runner.cfg.GrpcPort()))
+	logger.Info("gRPC health method: /Health/ping")
 	if err := routerV1.Serve(listener); err != nil {
-		logger.Log.Fatalf("Failed to serve: %v", err)
+		logger.Fatal("Failed to serve: %v", err)
 	}
 }
 

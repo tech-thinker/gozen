@@ -1,9 +1,16 @@
 # Builder stage
-FROM golang:1.22 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26 AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /src
 ADD . .
-RUN go build -o app .
+RUN CGO_ENABLED=0 \
+    GOOS=$TARGETOS \
+    GOARCH=$TARGETARCH \
+    go build -a -ldflags="-s -w" -o app .
+RUN chmod +x app
 
 # Runner Stage
 FROM alpine:edge

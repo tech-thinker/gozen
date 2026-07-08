@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"gorm.io/gorm"
 
 	"{{.PackageName}}/logger"
@@ -21,7 +22,7 @@ func (r *healthRepo) Ping(ctx context.Context) (bool, error) {
 		Success: true,
 		Message: "Service is up and running.",
 	}
-	logger.Log.Info(doc)
+	logger.Info(doc.Message)
 	return true, nil
 }
 

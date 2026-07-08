@@ -5,36 +5,36 @@ import (
 	"gorm.io/gorm"
 )
 
-var registeredModels []interface{}
+var registeredModels []any
 
-func RegisterModel(model interface{}) {
+func RegisterModel(model any) {
 	registeredModels = append(registeredModels, model)
 }
 
 func LoadModels(db *gorm.DB) {
 	for _, model := range registeredModels {
 		if err := migrate(db, model); err != nil {
-			logger.Log.Fatal("failed to automigrate models:", err)
+			logger.Fatal("failed to automigrate models:", err)
 		}
 	}
-	logger.Log.Println("All models initialized successfully")
+	logger.Info("All models initialized successfully")
 }
 
-func migrate(db *gorm.DB, dst interface{}) error {
+func migrate(db *gorm.DB, dst any) error {
 	// Check if the schema exists, and create it if it doesn't
 	if !db.Migrator().HasTable(dst) {
 		err := db.Migrator().CreateTable(dst)
 		if err != nil {
-			logger.Log.Println("Failed to create schema:", err)
+			logger.Info("Failed to create schema:", err)
 			return err
 		}
-		logger.Log.Println("Schema created successfully")
+		logger.Info("Schema created successfully")
 	} else {
-		logger.Log.Println("Schema already exists")
+		logger.Info("Schema already exists")
 	}
 	return nil
 }
 
 func init() {
-	registeredModels = make([]interface{}, 0)
+	registeredModels = make([]any, 0)
 }

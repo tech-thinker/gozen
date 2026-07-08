@@ -1,0 +1,94 @@
+package errors
+
+import (
+	"{{.PackageName}}/errorslug"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+type AppError struct {
+	Code    int
+	Slug    string
+	Message string
+}
+
+// New() creates AppError
+//
+// code is http/grpc status code, slug is UNIQ_KEY_FOR_ERROR, msg is proper error message.
+func New(code int, slug string, msg string) *AppError {
+	return &AppError{
+		Code:    code,
+		Slug:    slug,
+		Message: msg,
+	}
+}
+
+func (e *AppError) Error() string {
+	return e.Message
+}
+
+// ToGrpc will convert AppError to gRPC compatible error
+//
+// When you want to send gRPC error responce from AppError then you can use this.
+func (e *AppError) ToGrpc() error {
+	// 1. Get the equivalent gRPC code
+	grpcCode, ok := HTTPToGRPC[e.Code]
+	if !ok {
+		grpcCode = codes.Internal
+	}
+
+	// 2. Create the base status
+	st := status.New(grpcCode, e.Message)
+
+	// 3. Attach the Slug using ErrorInfo (Standard gRPC practice)
+	desc, err := st.WithDetails(&errdetails.ErrorInfo{
+		Reason: e.Slug,
+		Domain: "your-service-name", // Change to your actual service/domain
+	})
+
+	if err != nil {
+		return st.Err() // Return base status if detail attachment fails
+	}
+
+	return desc.Err()
+}
+
+// ToAppError will convert error to AppError
+//
+// When error is instance of AppError then you can use this method to get AppError functionality.
+func ToAppError(err error) *AppError {
+	if appErr, ok := err.(*AppError); ok {
+		return appErr
+	}
+	return New(InternalError, errorslug.INTERNAL_ERROR, "Internal Server Error")
+}
+
+// ParseGrpcError will convert gRPC Error to AppErrors
+//
+// When you receive grpcError response from protobuff then you want to convert it into app error.
+// Then you need to use this method.
+func ParseGrpcError(err error) *AppError {
+	if err == nil {
+		return nil
+	}
+	st, ok := status.FromError(err)
+	if !ok {
+		return New(InternalError, errorslug.INTERNAL_ERROR, err.Error())
+	}
+
+	httpCode, ok := GRPCToHTTP[st.Code()]
+	if !ok {
+		httpCode = InternalError
+	}
+
+	slug := errorslug.INTERNAL_ERROR
+	for _, detail := range st.Details() {
+		if info, ok := detail.(*errdetails.ErrorInfo); ok {
+			slug = info.Reason
+			break
+		}
+	}
+
+	return New(httpCode, slug, st.Message())
+}
