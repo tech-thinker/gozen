@@ -5,6 +5,7 @@ import (
 
 	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
 	"{{.PackageName}}/repository"
 	"{{.PackageName}}/utils"
 )
@@ -14,10 +15,13 @@ type HealthSvc interface {
 }
 
 type healthSvc struct {
+	profiler      profiler.Profiler
 	healthRepo repository.HealthRepo
 }
 
 func (svc *healthSvc) Ping(ctx context.Context) (*models.Health, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "HealthSvc:Ping")
+	defer span.End()
 
 	status, err := svc.healthRepo.Ping(ctx)
 
@@ -36,9 +40,11 @@ func (svc *healthSvc) Ping(ctx context.Context) (*models.Health, error) {
 }
 
 func NewHealthSvc(
+	profiler      profiler.Profiler,
 	healthRepo repository.HealthRepo,
 ) HealthSvc {
 	return &healthSvc{
+		profiler: profiler,
 		healthRepo: healthRepo,
 	}
 }

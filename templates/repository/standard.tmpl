@@ -8,6 +8,7 @@ import (
 
 	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
 )
 
 type {{.InterfaceName}}Repo interface {
@@ -24,94 +25,132 @@ type {{.InterfaceName}}Repo interface {
 
 type {{.StructName}}Repo struct {
 	db *gorm.DB
+	profiler profiler.Profiler
 }
 
-func (r *{{.StructName}}Repo) Insert(ctx context.Context, doc models.{{.InterfaceName}}) (uint, error) {
-	result := r.db.Create(doc)
+func (repo *{{.StructName}}Repo) Insert(ctx context.Context, doc models.{{.InterfaceName}}) (uint, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:Insert")
+	defer span.End()
+
+	result := repo.db.Create(&doc)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return 0, result.Error
 	}
 	return doc.ID, nil
 }
 
-func (r *{{.StructName}}Repo) InsertAll(ctx context.Context, docs []models.{{.InterfaceName}}) (bool, error) {
-	result := r.db.Create(docs)
+func (repo *{{.StructName}}Repo) InsertAll(ctx context.Context, docs []models.{{.InterfaceName}}) (bool, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:InsertAll")
+	defer span.End()
+
+	result := repo.db.Create(&docs)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return false, result.Error
 	}
 	return true, nil
 }
 
-func (r *{{.StructName}}Repo) Update(ctx context.Context, doc models.{{.InterfaceName}}, field string, value any) (bool, error) {
-	result := r.db.Model(&doc).Update(field, value)
+func (repo *{{.StructName}}Repo) Update(ctx context.Context, doc models.{{.InterfaceName}}, field string, value any) (bool, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:Update")
+	defer span.End()
+
+	result := repo.db.Model(&doc).Update(field, value)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return false, result.Error
 	}
 	return true, nil
 }
 
-func (r *{{.StructName}}Repo) UpdateAll(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
-	result := r.db.Updates(doc)
+func (repo *{{.StructName}}Repo) UpdateAll(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:UpdateAll")
+	defer span.End()
+
+	result := repo.db.Updates(doc)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return false, result.Error
 	}
 	return true, nil
 }
 
-func (r *{{.StructName}}Repo) Delete(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
-	result := r.db.Delete(doc)
+func (repo *{{.StructName}}Repo) Delete(ctx context.Context, doc models.{{.InterfaceName}}) (bool, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:Delete")
+	defer span.End()
+
+	result := repo.db.Delete(doc)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return false, result.Error
 	}
 	return true, nil
 }
 
-func (r *{{.StructName}}Repo) DeleteAll(ctx context.Context, ids []uint) (bool, error) {
-	result := r.db.Where("ID in ?", ids).Delete(&models.{{.InterfaceName}}{})
+func (repo *{{.StructName}}Repo) DeleteAll(ctx context.Context, ids []uint) (bool, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:DeleteAll")
+	defer span.End()
+
+	result := repo.db.Where("ID in ?", ids).Delete(&models.{{.InterfaceName}}{})
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return false, result.Error
 	}
 	return true, nil
 }
 
-func (r *{{.StructName}}Repo) FindByID(ctx context.Context, id uint) (*models.{{.InterfaceName}}, error) {
+func (repo *{{.StructName}}Repo) FindByID(ctx context.Context, id uint) (*models.{{.InterfaceName}}, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:FindByID")
+	defer span.End()
+
 	var doc models.{{.InterfaceName}}
-	result := r.db.First(&doc, id)
+	result := repo.db.First(&doc, id)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return &doc, result.Error
 	}
 	return &doc, nil
 }
 
-func (r *{{.StructName}}Repo) FindBy(ctx context.Context, key string, value any) (*models.{{.InterfaceName}}, error) {
+func (repo *{{.StructName}}Repo) FindBy(ctx context.Context, key string, value any) (*models.{{.InterfaceName}}, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:FindBy")
+	defer span.End()
+
 	var doc models.{{.InterfaceName}}
-	result := r.db.Where(fmt.Sprintf(`%s=?`, key), value).First(&doc)
+	result := repo.db.Where(fmt.Sprintf(`%s=?`, key), value).First(&doc)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return &doc, result.Error
 	}
 	return &doc, nil
 }
 
-func (r *{{.StructName}}Repo) FindAll(ctx context.Context) ([]models.{{.InterfaceName}}, error) {
+func (repo *{{.StructName}}Repo) FindAll(ctx context.Context) ([]models.{{.InterfaceName}}, error) {
+	ctx, span := repo.profiler.StartSpan(ctx, "{{.InterfaceName}}Repo:FindAll")
+	defer span.End()
+
 	var docs []models.{{.InterfaceName}}
-	result := r.db.Find(docs)
+	result := repo.db.Find(&docs)
 	if result.Error != nil {
-		logger.ErrorContext(ctx, result.Error())
+		logger.ErrorContext(ctx, result.Error.Error())
+		repo.profiler.RecordError(span, result.Error)
 		return docs, result.Error
 	}
 	return docs, nil
 }
 
-func New{{.InterfaceName}}Repo(db *gorm.DB) {{.InterfaceName}}Repo {
+func New{{.InterfaceName}}Repo(db *gorm.DB, profiler profiler.Profiler) {{.InterfaceName}}Repo {
 	return &{{.StructName}}Repo{
 		db: db,
+		profiler: profiler,
 	}
 }
