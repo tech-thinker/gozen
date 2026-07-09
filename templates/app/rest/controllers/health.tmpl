@@ -24,6 +24,9 @@ func (c *HealthController) Route(router *gin.Engine) *gin.RouterGroup {
 }
 
 func (c *HealthController) Ping(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "HealthController:Ping")
+	defer span.End()
+
 	res, err := c.svc.HealthSvc().Ping(ctx.Request.Context())
 
 	if err != nil {

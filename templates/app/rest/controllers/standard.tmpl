@@ -30,6 +30,9 @@ func (c *{{.InterfaceName}}Controller) Route(router *gin.Engine) *gin.RouterGrou
 }
 
 func (c *{{.InterfaceName}}Controller) Create(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "{{.InterfaceName}}Controller:Create")
+	defer span.End()
+
     var req models.{{.InterfaceName}}
 
 	// Bind JSON from request body to struct
@@ -57,6 +60,9 @@ func (c *{{.InterfaceName}}Controller) Create(ctx *gin.Context) {
 }
 
 func (c *{{.InterfaceName}}Controller) Get(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "{{.InterfaceName}}Controller:Get")
+	defer span.End()
+
 	// Extract the 'id' parameter from the URL path
 	id := ctx.Param("id")
 
@@ -85,6 +91,9 @@ func (c *{{.InterfaceName}}Controller) Get(ctx *gin.Context) {
 }
 
 func (c *{{.InterfaceName}}Controller) Update(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "{{.InterfaceName}}Controller:Update")
+	defer span.End()
+
 	// Extract the 'id' parameter from the URL path
 	id := ctx.Param("id")
 
@@ -125,6 +134,9 @@ func (c *{{.InterfaceName}}Controller) Update(ctx *gin.Context) {
 }
 
 func (c *{{.InterfaceName}}Controller) Delete(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "{{.InterfaceName}}Controller:Delete")
+	defer span.End()
+
 	// Extract the 'id' parameter from the URL path
 	id := ctx.Param("id")
 
@@ -153,6 +165,9 @@ func (c *{{.InterfaceName}}Controller) Delete(ctx *gin.Context) {
 }
 
 func (c *{{.InterfaceName}}Controller) List(ctx *gin.Context) {
+	_, span := c.svc.Profiler().StartSpan(ctx.Copy().Request.Context(), "{{.InterfaceName}}Controller:List")
+	defer span.End()
+
     res, err := c.svc.{{.InterfaceName}}Svc().List(ctx)
 	if err!=nil {
 		ctx.JSON(http.StatusOK, gin.H{

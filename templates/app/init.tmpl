@@ -47,14 +47,13 @@ func Init(cfg config.Configuration, instance instance.Instance) ServiceRegistry 
 
 	// Repository init
 	ipWhiteListRepo := repository.NewIPWhiteListRepo(db, profiler)
-	healthRepo := repository.NewHealthRepo(db)
+	healthRepo := repository.NewHealthRepo(db, profiler)
 
 	// Middleware
-
 	middleware := middlewares.NewMiddleware(cfg, profiler, ipWhiteListRepo)
 
 	// Service init
-	healthSvc := service.NewHealthSvc(healthRepo)
+	healthSvc := service.NewHealthSvc(profiler, healthRepo)
 
 	return &serviceRegistry{
 		profiler:   profiler,

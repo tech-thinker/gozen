@@ -23,8 +23,12 @@ This Go project was scaffolded using [`gozen`](https://github.com/tech-thinker/g
 | VERSION                     | Application version.                                                    |
 | APP_NAME                    | Application name.                                                       |
 | APP_ENV                     | Environment name (development, staging, production).                    |
+| TZ	                      | To set any timezone on the Environment.				                    |
+| CORS_ORIGINS	              | CORS restriction rules. 				                    			|
 | API_PORT                    | Port number for the rest api to listen on.                              |
 | GRPC_PORT                   | Port number for the gRPC api to listen on.                              |
+| OTEL_EXPOTER_URL            | Opem Telemetry Expoter URL.				                                |
+| OTEL_PROTOCOL               | Open Telemetry Exporter protocol (`grpc`/`http`)                        |
 | DB_DRIVER                   | Database driver (mysql, postgres, sqlite etc.).                         |
 | DB_HOST                     | Database host address.                                                  |
 | DB_PORT                     | Database port number.                                                   |

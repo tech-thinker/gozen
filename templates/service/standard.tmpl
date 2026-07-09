@@ -5,6 +5,7 @@ import (
 
 	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
 	"{{.PackageName}}/repository"
 )
 
@@ -17,10 +18,13 @@ type {{.InterfaceName}}Svc interface {
 }
 
 type {{.StructName}}Svc struct {
+	profiler      profiler.Profiler
 	{{.StructName}}Repo repository.{{.InterfaceName}}Repo
 }
 
 func (svc *{{.StructName}}Svc) Create(ctx context.Context, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "{{.InterfaceName}}Svc:Create")
+	defer span.End()
 
 	id, err := svc.{{.StructName}}Repo.Insert(ctx, doc)
 
@@ -35,6 +39,8 @@ func (svc *{{.StructName}}Svc) Create(ctx context.Context, doc models.{{.Interfa
 }
 
 func (svc *{{.StructName}}Svc) Get(ctx context.Context, id int) (*models.{{.InterfaceName}}, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "{{.InterfaceName}}Svc:Get")
+	defer span.End()
 
 	doc, err :=  svc.{{.StructName}}Repo.FindByID(ctx, uint(id))
 
@@ -47,6 +53,9 @@ func (svc *{{.StructName}}Svc) Get(ctx context.Context, id int) (*models.{{.Inte
 }
 
 func (svc *{{.StructName}}Svc) Update(ctx context.Context, id int, doc models.{{.InterfaceName}}) (*models.{{.InterfaceName}}, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "{{.InterfaceName}}Svc:Update")
+	defer span.End()
+
 	doc.ID=uint(id)
 
 	_, err := svc.{{.StructName}}Repo.UpdateAll(ctx, doc)
@@ -59,6 +68,9 @@ func (svc *{{.StructName}}Svc) Update(ctx context.Context, id int, doc models.{{
 }
 
 func (svc *{{.StructName}}Svc) Delete(ctx context.Context, id int) (*models.{{.InterfaceName}}, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "{{.InterfaceName}}Svc:Delete")
+	defer span.End()
+
 	doc := models.{{.InterfaceName}}{
 		ID: uint(id),
 	}
@@ -74,6 +86,8 @@ func (svc *{{.StructName}}Svc) Delete(ctx context.Context, id int) (*models.{{.I
 }
 
 func (svc *{{.StructName}}Svc) List(ctx context.Context) ([]models.{{.InterfaceName}}, error) {
+	ctx, span := svc.profiler.StartSpan(ctx, "{{.InterfaceName}}Svc:List")
+	defer span.End()
 
 	docs, err := svc.{{.StructName}}Repo.FindAll(ctx)
 	if err != nil {
@@ -85,9 +99,11 @@ func (svc *{{.StructName}}Svc) List(ctx context.Context) ([]models.{{.InterfaceN
 }
 
 func New{{.InterfaceName}}Svc(
+	profiler      profiler.Profiler,
 	{{.StructName}}Repo repository.{{.InterfaceName}}Repo,
 ) {{.InterfaceName}}Svc {
 	return &{{.StructName}}Svc{
+		profiler: profiler,
 		{{.StructName}}Repo: {{.StructName}}Repo,
 	}
 }

@@ -7,6 +7,7 @@ import (
 
 	"{{.PackageName}}/logger"
 	"{{.PackageName}}/models"
+	"{{.PackageName}}/profiler"
 )
 
 type HealthRepo interface {
@@ -15,9 +16,10 @@ type HealthRepo interface {
 
 type healthRepo struct {
 	db *gorm.DB
+	profiler profiler.Profiler
 }
 
-func (r *healthRepo) Ping(ctx context.Context) (bool, error) {
+func (repo *healthRepo) Ping(ctx context.Context) (bool, error) {
 	doc := models.Health{
 		Success: true,
 		Message: "Service is up and running.",
@@ -26,8 +28,9 @@ func (r *healthRepo) Ping(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func NewHealthRepo(db *gorm.DB) HealthRepo {
+func NewHealthRepo(db *gorm.DB, profiler profiler.Profiler) HealthRepo {
 	return &healthRepo{
 		db: db,
+		profiler: profiler,
 	}
 }
