@@ -55,7 +55,7 @@ func (h *projectHelper) SetupDocker(project models.Project) error {
 		{TemplatePath: "templates/docker/Dockerfile.dev", Destination: "/docker/Dockerfile.dev"},
 		{TemplatePath: "templates/docker/modd-debug.conf", Destination: "/docker/modd-debug.conf"},
 		{TemplatePath: "templates/docker/modd-dev.conf", Destination: "/docker/modd-dev.conf"},
-		{TemplatePath: "templates/docker/Dockerfile.prod", Destination: "Dockerfile"},
+		{TemplatePath: "templates/docker/Dockerfile.prod", Destination: "/docker/Dockerfile.prod"},
 		{TemplatePath: "templates/docker-compose-debug.yml.tmpl", Destination: "/docker-compose-debug.yml"},
 		{TemplatePath: "templates/docker-compose.yml.tmpl", Destination: "/docker-compose.yml"},
 	}
