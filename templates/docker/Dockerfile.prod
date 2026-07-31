@@ -9,16 +9,26 @@ ADD . .
 RUN CGO_ENABLED=0 \
     GOOS=$TARGETOS \
     GOARCH=$TARGETARCH \
-    go build -a -ldflags="-s -w" -o app .
-RUN chmod +x app
+    go build -a -ldflags="-s -w" -o startx .
+RUN chmod +x startx
 
 # Runner Stage
 FROM alpine:edge
+
+LABEL maintainer="Tech Thinker <mrasif.in>" \
+      org.opencontainers.image.authors="Asif <mrasif.in>" \
+      org.opencontainers.image.title="{{.AppName}}" \
+      org.opencontainers.image.description="{{.AppName}}"
+
+ENV OTEL_RESOURCE_ATTRIBUTES=deployment.environment=production
+ENV TZ=Asia/Kolkata
+
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache tzdata
 RUN apk add --no-cache iputils-ping
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /src/app /app/app
-CMD ["/app/app", "start"]
+COPY --from=builder /src/startx /app/startx
+ENTRYPOINT ["/app/startx"]
+CMD ["start"]
 EXPOSE 3000
