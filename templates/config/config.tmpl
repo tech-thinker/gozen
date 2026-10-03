@@ -14,6 +14,7 @@ type Configuration interface {
 	CORSOrigins() []string
 	GrpcPort() string
 
+	OtelEnabled() bool
 	OtelExpoterUrl() string
 	OtelProtocol() string
 
@@ -32,6 +33,7 @@ type configuration struct {
 	corsOrigins string
 	grpcPort string
 
+	otelEnabled    bool
 	otelExpoterUrl string
 	otelProtocol   string
 
@@ -74,6 +76,11 @@ func (cfg *configuration) CORSOrigins() []string {
 // GrpcPort returns port
 func (cfg *configuration) GrpcPort() string {
 	return cfg.grpcPort
+}
+
+// OtelEnabled returns true if OTEL is enabled
+func (cfg *configuration) OtelEnabled() bool {
+	return cfg.otelEnabled
 }
 
 // OtelExpoterUrl returns port
@@ -130,6 +137,7 @@ func Init(
 	config.corsOrigins = env.GetString("CORS_ORIGINS")
 	config.grpcPort = env.GetString("GRPC_PORT")
 
+	config.otelEnabled = env.GetBool("OTEL_ENABLED")
 	config.otelExpoterUrl = env.GetString("OTEL_EXPOTER_URL")
 	config.otelProtocol = env.GetString("OTEL_PROTOCOL")
 

@@ -72,12 +72,17 @@ func Init(cfg config.Configuration) Instance {
 	config := otelkit.NewProviderConfig(
 		cfg.AppName(),
 		cfg.Version(),
-	).WithOTLPExporter(
-		cfg.OtelExpoterUrl(),
-		cfg.OtelProtocol(),
-		true,
 	).WithSampling("probabilistic", 1.0)
-
+	if cfg.OtelEnabled() {
+		config = config.WithOTLPExporter(
+			cfg.OtelExpoterUrl(),
+			cfg.OtelProtocol(),
+			true,
+		)
+		fmt.Println("OTEL Exporter Enabled.")
+	} else {
+		fmt.Println("OTEL Exporter Disabled.")
+	}
 	singleton.otelProvider, err = otelkit.NewProvider(context.Background(), config)
 	singleton.tracer = otelkit.New(cfg.AppName())
 
