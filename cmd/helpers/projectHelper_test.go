@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/tech-thinker/gozen/cmd/repository"
+	"github.com/tech-thinker/gozen/mocks"
 	"github.com/tech-thinker/gozen/models"
 )
 
 func Test_projectHelper_InitProject(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -61,7 +61,7 @@ func Test_projectHelper_InitProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -81,7 +81,7 @@ func Test_projectHelper_InitProject(t *testing.T) {
 
 func Test_projectHelper_SetupEnv(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -130,7 +130,7 @@ func Test_projectHelper_SetupEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -148,7 +148,7 @@ func Test_projectHelper_SetupEnv(t *testing.T) {
 
 func Test_projectHelper_SetupDocker(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -197,7 +197,7 @@ func Test_projectHelper_SetupDocker(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -215,7 +215,7 @@ func Test_projectHelper_SetupDocker(t *testing.T) {
 
 func Test_projectHelper_SetupUtils(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -264,7 +264,7 @@ func Test_projectHelper_SetupUtils(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -282,7 +282,7 @@ func Test_projectHelper_SetupUtils(t *testing.T) {
 
 func Test_projectHelper_SetupRepository(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -331,7 +331,7 @@ func Test_projectHelper_SetupRepository(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -349,7 +349,7 @@ func Test_projectHelper_SetupRepository(t *testing.T) {
 
 func Test_projectHelper_SetupService(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -398,7 +398,7 @@ func Test_projectHelper_SetupService(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -416,7 +416,7 @@ func Test_projectHelper_SetupService(t *testing.T) {
 
 func Test_projectHelper_SetupModel(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -465,7 +465,7 @@ func Test_projectHelper_SetupModel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -483,7 +483,7 @@ func Test_projectHelper_SetupModel(t *testing.T) {
 
 func Test_projectHelper_SetupProfiler(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -532,7 +532,7 @@ func Test_projectHelper_SetupProfiler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -550,7 +550,7 @@ func Test_projectHelper_SetupProfiler(t *testing.T) {
 
 func Test_projectHelper_SetupLogger(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -599,7 +599,7 @@ func Test_projectHelper_SetupLogger(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -617,7 +617,7 @@ func Test_projectHelper_SetupLogger(t *testing.T) {
 
 func Test_projectHelper_SetupConfig(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -666,7 +666,7 @@ func Test_projectHelper_SetupConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -684,7 +684,7 @@ func Test_projectHelper_SetupConfig(t *testing.T) {
 
 func Test_projectHelper_SetupConstants(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -733,7 +733,7 @@ func Test_projectHelper_SetupConstants(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -751,7 +751,7 @@ func Test_projectHelper_SetupConstants(t *testing.T) {
 
 func Test_projectHelper_CreateRestAPI(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -800,7 +800,7 @@ func Test_projectHelper_CreateRestAPI(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {
@@ -818,7 +818,7 @@ func Test_projectHelper_CreateRestAPI(t *testing.T) {
 
 func Test_projectHelper_CreategRPCAPI(t *testing.T) {
 	type fields struct {
-		systemRepo *repository.MockSystemRepo
+		systemRepo *mocks.MockSystemRepo
 	}
 	type args struct {
 		project models.Project
@@ -867,7 +867,7 @@ func Test_projectHelper_CreategRPCAPI(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				systemRepo: repository.NewMockSystemRepo(t),
+				systemRepo: mocks.NewMockSystemRepo(t),
 			}
 
 			if tt.prepare != nil {

@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package repository
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -15,10 +15,19 @@ func NewMockSystemRepo(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockSystemRepo {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockSystemRepo{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -78,9 +87,9 @@ type MockSystemRepo_ExecShell_Call struct {
 // ExecShell is a helper method to define mock.On call
 //   - command string
 //   - args ...string
-func (_e *MockSystemRepo_Expecter) ExecShell(command interface{}, args ...interface{}) *MockSystemRepo_ExecShell_Call {
+func (_e *MockSystemRepo_Expecter) ExecShell(command any, args ...any) *MockSystemRepo_ExecShell_Call {
 	return &MockSystemRepo_ExecShell_Call{Call: _e.mock.On("ExecShell",
-		append([]interface{}{command}, args...)...)}
+		append([]any{command}, args...)...)}
 }
 
 func (_c *MockSystemRepo_ExecShell_Call) Run(run func(command string, args ...string)) *MockSystemRepo_ExecShell_Call {
@@ -155,9 +164,9 @@ type MockSystemRepo_ExecShellRaw_Call struct {
 // ExecShellRaw is a helper method to define mock.On call
 //   - command string
 //   - args ...string
-func (_e *MockSystemRepo_Expecter) ExecShellRaw(command interface{}, args ...interface{}) *MockSystemRepo_ExecShellRaw_Call {
+func (_e *MockSystemRepo_Expecter) ExecShellRaw(command any, args ...any) *MockSystemRepo_ExecShellRaw_Call {
 	return &MockSystemRepo_ExecShellRaw_Call{Call: _e.mock.On("ExecShellRaw",
-		append([]interface{}{command}, args...)...)}
+		append([]any{command}, args...)...)}
 }
 
 func (_c *MockSystemRepo_ExecShellRaw_Call) Run(run func(command string, args ...string)) *MockSystemRepo_ExecShellRaw_Call {
@@ -217,7 +226,7 @@ type MockSystemRepo_Write_Call struct {
 //   - templatePath string
 //   - destination string
 //   - data interface{}
-func (_e *MockSystemRepo_Expecter) Write(appDir interface{}, templatePath interface{}, destination interface{}, data interface{}) *MockSystemRepo_Write_Call {
+func (_e *MockSystemRepo_Expecter) Write(appDir any, templatePath any, destination any, data any) *MockSystemRepo_Write_Call {
 	return &MockSystemRepo_Write_Call{Call: _e.mock.On("Write", appDir, templatePath, destination, data)}
 }
 
@@ -285,7 +294,7 @@ type MockSystemRepo_WriteAll_Call struct {
 //   - appDir string
 //   - fileConfigs []models.FileConfig
 //   - data interface{}
-func (_e *MockSystemRepo_Expecter) WriteAll(appDir interface{}, fileConfigs interface{}, data interface{}) *MockSystemRepo_WriteAll_Call {
+func (_e *MockSystemRepo_Expecter) WriteAll(appDir any, fileConfigs any, data any) *MockSystemRepo_WriteAll_Call {
 	return &MockSystemRepo_WriteAll_Call{Call: _e.mock.On("WriteAll", appDir, fileConfigs, data)}
 }
 
