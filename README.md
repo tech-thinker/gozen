@@ -1,7 +1,15 @@
 # gozen
-Simplified Golang MVC code generator.
+Gozen is a fast, cross-platform CLI tool designed to eliminate repetitive boilerplate and jumpstart backend development in Go. With a single command, Gozen scaffolds production-grade Go applications built on a clean Model-View-Controller (MVC) architectural pattern—complete with pre-configured database connectivity, dependency wiring, and standard project layouts.
 
 Read project documentation for more information here: [Documentation](docs/README.md).
+
+![Banner](docs/logo/banner.jpg)
+
+## Key Features
+- Instant MVC Scaffolding: Generates organized, maintainable folder structures separating data models, controllers, and application configuration.
+- Turnkey Database Setup: Automatically wires database drivers, pool configurations, and environment loaders with zero manual stitching.
+- Module-Ready Initialization: Sets up your Go module paths ([github.com/user/app](https://github.com/user/app)) directly during creation, ensuring clean imports out of the box.
+- Cross-Platform Support: Ships as a lightweight, zero-dependency standalone binary compiled natively for Linux, macOS, and Windows.
 
 ## Installation
 Download and install executable binary from GitHub releases page.
