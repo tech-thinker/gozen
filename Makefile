@@ -10,10 +10,14 @@ setup:
 	go mod tidy
 
 test:
-	go test -v ./...  -race -coverprofile=coverage.out -covermode=atomic
+	go test -v ./... -race -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/tech-thinker/gozen/cmd,github.com/tech-thinker/gozen/cmd/helpers,github.com/tech-thinker/gozen/cmd/repository,github.com/tech-thinker/gozen/cmd/service,github.com/tech-thinker/gozen/models,github.com/tech-thinker/gozen/utils,github.com/tech-thinker/gozen/wrappers
 
 coverage: test
-	go tool cover -func=coverage.out
+	@echo "=== Coverage (excluding mocks & main) ==="
+	@go tool cover -func=coverage.out | grep -v "_mock.go"
+	@echo ""
+	@echo "=== Total (excluding mocks & main) ==="
+	@go tool cover -func=coverage.out | grep -v "_mock.go" | tail -1
 
 coverage-html: test
 	mkdir -p coverage
@@ -73,14 +77,6 @@ clean:
 	rm -rf build
 
 generate-mocks:
-	# Mockery version v2.50.0
-	# It will work for below version v3
-	# Wrapper
-	@mockery --name=ShellWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=shellWrapper_mock.go --structname=MockShellWrapper
-	@mockery --name=FileSystemWrapper --dir=wrappers --output=wrappers --outpkg=wrappers --filename=fileSystemWrapper_mock.go --structname=MockFileSystemWrapper
-	# Repository
-	@mockery --name=SystemRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=system_mock.go --structname=MockSystemRepo
-	@mockery --name=ProjectRepo --dir=cmd/repository --output=cmd/repository --outpkg=repository --filename=project_mock.go --structname=MockProjectRepo
-	# Helpers
-	@mockery --name=ProjectHelper --dir=cmd/helpers --output=cmd/helpers --outpkg=helpers --filename=projectHelper_mock.go --structname=MockProjectHelper
-	@mockery --name=CodeHelper --dir=cmd/helpers --output=cmd/helpers --outpkg=helpers --filename=codeHelper_mock.go --structname=MockCodeHelper
+	# Mockery version v3.8.0
+	@find . -type f -name '*_mock.go' -delete
+	@mockery

@@ -5,16 +5,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/tech-thinker/gozen/cmd/helpers"
-	"github.com/tech-thinker/gozen/cmd/repository"
+	"github.com/tech-thinker/gozen/mocks"
 	"github.com/tech-thinker/gozen/models"
 )
 
 func Test_appService_CreateApp(t *testing.T) {
 	type fields struct {
-		projectRepo   *repository.MockProjectRepo
-		projectHelper *helpers.MockProjectHelper
-		codeHelper    *helpers.MockCodeHelper
+		projectRepo   *mocks.MockProjectRepo
+		projectHelper *mocks.MockProjectHelper
+		codeHelper    *mocks.MockCodeHelper
 	}
 	type args struct {
 		project models.Project
@@ -351,9 +350,9 @@ func Test_appService_CreateApp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			tt.fields = fields{
-				projectRepo:   repository.NewMockProjectRepo(t),
-				projectHelper: helpers.NewMockProjectHelper(t),
-				codeHelper:    helpers.NewMockCodeHelper(t),
+				projectRepo:   mocks.NewMockProjectRepo(t),
+				projectHelper: mocks.NewMockProjectHelper(t),
+				codeHelper:    mocks.NewMockCodeHelper(t),
 			}
 
 			if tt.prepare != nil {
@@ -367,6 +366,92 @@ func Test_appService_CreateApp(t *testing.T) {
 			)
 			if err := cmd.CreateApp(tt.args.project); (err != nil) != tt.wantErr {
 				t.Errorf("appService.CreateApp() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_appService_GenerateModel(t *testing.T) {
+	type fields struct {
+		projectRepo   *mocks.MockProjectRepo
+		projectHelper *mocks.MockProjectHelper
+		codeHelper    *mocks.MockCodeHelper
+	}
+	type args struct {
+		doc models.Generator
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		prepare func(f *fields)
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "success should call codeHelper.GenerateModel",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.codeHelper.On("GenerateModel", mock.Anything).Return(nil)
+			},
+			args: args{
+				doc: models.Generator{
+					Project: models.Project{
+						AppName:     "testapp",
+						PackageName: "github.com/test/app",
+						Driver:      "postgres",
+						WorkingDir:  ".",
+					},
+					Type:          "model",
+					InterfaceName: "IUser",
+					StructName:    "User",
+					RouteName:     "user",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "codeHelper.GenerateModel fail should fail",
+			fields: fields{},
+			prepare: func(f *fields) {
+				f.codeHelper.On("GenerateModel", mock.Anything).Return(errors.New("generate error"))
+			},
+			args: args{
+				doc: models.Generator{
+					Project: models.Project{
+						AppName:     "testapp",
+						PackageName: "github.com/test/app",
+						Driver:      "postgres",
+						WorkingDir:  ".",
+					},
+					Type:          "model",
+					InterfaceName: "IUser",
+					StructName:    "User",
+					RouteName:     "user",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			tt.fields = fields{
+				projectRepo:   mocks.NewMockProjectRepo(t),
+				projectHelper: mocks.NewMockProjectHelper(t),
+				codeHelper:    mocks.NewMockCodeHelper(t),
+			}
+
+			if tt.prepare != nil {
+				tt.prepare(&tt.fields)
+			}
+
+			cmd := NewAppService(
+				tt.fields.projectRepo,
+				tt.fields.projectHelper,
+				tt.fields.codeHelper,
+			)
+			if err := cmd.GenerateModel(tt.args.doc); (err != nil) != tt.wantErr {
+				t.Errorf("appService.GenerateModel() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

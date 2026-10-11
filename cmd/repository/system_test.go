@@ -7,16 +7,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/tech-thinker/gozen/mocks"
 	"github.com/tech-thinker/gozen/models"
 	"github.com/tech-thinker/gozen/utils"
-	"github.com/tech-thinker/gozen/wrappers"
 )
 
 func Test_systemRepo_Write(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
-		shellWrapper      *wrappers.MockShellWrapper
-		fileSystemWrapper *wrappers.MockFileSystemWrapper
+		shellWrapper      *mocks.MockShellWrapper
+		fileSystemWrapper *mocks.MockFileSystemWrapper
 	}
 	type args struct {
 		appDir       string
@@ -95,8 +95,8 @@ func Test_systemRepo_Write(t *testing.T) {
 			// Preparing mocks
 			tt.fields = fields{
 				templatesFS:       utils.GetMockTmpl(),
-				shellWrapper:      wrappers.NewMockShellWrapper(t),
-				fileSystemWrapper: wrappers.NewMockFileSystemWrapper(t),
+				shellWrapper:      mocks.NewMockShellWrapper(t),
+				fileSystemWrapper: mocks.NewMockFileSystemWrapper(t),
 			}
 
 			if tt.prepare != nil {
@@ -118,8 +118,8 @@ func Test_systemRepo_Write(t *testing.T) {
 func Test_systemRepo_WriteAll(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
-		shellWrapper      *wrappers.MockShellWrapper
-		fileSystemWrapper *wrappers.MockFileSystemWrapper
+		shellWrapper      *mocks.MockShellWrapper
+		fileSystemWrapper *mocks.MockFileSystemWrapper
 	}
 	type args struct {
 		appDir      string
@@ -201,8 +201,8 @@ func Test_systemRepo_WriteAll(t *testing.T) {
 			// Preparing mocks
 			tt.fields = fields{
 				templatesFS:       utils.GetMockTmpl(),
-				shellWrapper:      wrappers.NewMockShellWrapper(t),
-				fileSystemWrapper: wrappers.NewMockFileSystemWrapper(t),
+				shellWrapper:      mocks.NewMockShellWrapper(t),
+				fileSystemWrapper: mocks.NewMockFileSystemWrapper(t),
 			}
 
 			if tt.prepare != nil {
@@ -224,8 +224,8 @@ func Test_systemRepo_WriteAll(t *testing.T) {
 func Test_systemRepo_ExecShell(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
-		shellWrapper      *wrappers.MockShellWrapper
-		fileSystemWrapper *wrappers.MockFileSystemWrapper
+		shellWrapper      *mocks.MockShellWrapper
+		fileSystemWrapper *mocks.MockFileSystemWrapper
 	}
 	type args struct {
 		command string
@@ -270,8 +270,8 @@ func Test_systemRepo_ExecShell(t *testing.T) {
 			// Preparing mocks
 			tt.fields = fields{
 				templatesFS:       utils.GetMockTmpl(),
-				shellWrapper:      wrappers.NewMockShellWrapper(t),
-				fileSystemWrapper: wrappers.NewMockFileSystemWrapper(t),
+				shellWrapper:      mocks.NewMockShellWrapper(t),
+				fileSystemWrapper: mocks.NewMockFileSystemWrapper(t),
 			}
 
 			if tt.prepare != nil {
@@ -298,8 +298,8 @@ func Test_systemRepo_ExecShell(t *testing.T) {
 func Test_systemRepo_ExecShellRaw(t *testing.T) {
 	type fields struct {
 		templatesFS       embed.FS
-		shellWrapper      *wrappers.MockShellWrapper
-		fileSystemWrapper *wrappers.MockFileSystemWrapper
+		shellWrapper      *mocks.MockShellWrapper
+		fileSystemWrapper *mocks.MockFileSystemWrapper
 	}
 	type args struct {
 		command string
@@ -343,8 +343,8 @@ func Test_systemRepo_ExecShellRaw(t *testing.T) {
 			// Preparing mocks
 			tt.fields = fields{
 				templatesFS:       utils.GetMockTmpl(),
-				shellWrapper:      wrappers.NewMockShellWrapper(t),
-				fileSystemWrapper: wrappers.NewMockFileSystemWrapper(t),
+				shellWrapper:      mocks.NewMockShellWrapper(t),
+				fileSystemWrapper: mocks.NewMockFileSystemWrapper(t),
 			}
 
 			if tt.prepare != nil {

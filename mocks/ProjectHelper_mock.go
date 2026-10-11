@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package helpers
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -15,10 +15,19 @@ func NewMockProjectHelper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockProjectHelper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockProjectHelper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -60,7 +69,7 @@ type MockProjectHelper_CreateRestAPI_Call struct {
 
 // CreateRestAPI is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) CreateRestAPI(project interface{}) *MockProjectHelper_CreateRestAPI_Call {
+func (_e *MockProjectHelper_Expecter) CreateRestAPI(project any) *MockProjectHelper_CreateRestAPI_Call {
 	return &MockProjectHelper_CreateRestAPI_Call{Call: _e.mock.On("CreateRestAPI", project)}
 }
 
@@ -111,7 +120,7 @@ type MockProjectHelper_CreategRPCAPI_Call struct {
 
 // CreategRPCAPI is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) CreategRPCAPI(project interface{}) *MockProjectHelper_CreategRPCAPI_Call {
+func (_e *MockProjectHelper_Expecter) CreategRPCAPI(project any) *MockProjectHelper_CreategRPCAPI_Call {
 	return &MockProjectHelper_CreategRPCAPI_Call{Call: _e.mock.On("CreategRPCAPI", project)}
 }
 
@@ -162,7 +171,7 @@ type MockProjectHelper_InitProject_Call struct {
 
 // InitProject is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) InitProject(project interface{}) *MockProjectHelper_InitProject_Call {
+func (_e *MockProjectHelper_Expecter) InitProject(project any) *MockProjectHelper_InitProject_Call {
 	return &MockProjectHelper_InitProject_Call{Call: _e.mock.On("InitProject", project)}
 }
 
@@ -213,7 +222,7 @@ type MockProjectHelper_SetupConfig_Call struct {
 
 // SetupConfig is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupConfig(project interface{}) *MockProjectHelper_SetupConfig_Call {
+func (_e *MockProjectHelper_Expecter) SetupConfig(project any) *MockProjectHelper_SetupConfig_Call {
 	return &MockProjectHelper_SetupConfig_Call{Call: _e.mock.On("SetupConfig", project)}
 }
 
@@ -264,7 +273,7 @@ type MockProjectHelper_SetupConstants_Call struct {
 
 // SetupConstants is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupConstants(project interface{}) *MockProjectHelper_SetupConstants_Call {
+func (_e *MockProjectHelper_Expecter) SetupConstants(project any) *MockProjectHelper_SetupConstants_Call {
 	return &MockProjectHelper_SetupConstants_Call{Call: _e.mock.On("SetupConstants", project)}
 }
 
@@ -315,7 +324,7 @@ type MockProjectHelper_SetupDocker_Call struct {
 
 // SetupDocker is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupDocker(project interface{}) *MockProjectHelper_SetupDocker_Call {
+func (_e *MockProjectHelper_Expecter) SetupDocker(project any) *MockProjectHelper_SetupDocker_Call {
 	return &MockProjectHelper_SetupDocker_Call{Call: _e.mock.On("SetupDocker", project)}
 }
 
@@ -366,7 +375,7 @@ type MockProjectHelper_SetupEnv_Call struct {
 
 // SetupEnv is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupEnv(project interface{}) *MockProjectHelper_SetupEnv_Call {
+func (_e *MockProjectHelper_Expecter) SetupEnv(project any) *MockProjectHelper_SetupEnv_Call {
 	return &MockProjectHelper_SetupEnv_Call{Call: _e.mock.On("SetupEnv", project)}
 }
 
@@ -417,7 +426,7 @@ type MockProjectHelper_SetupLogger_Call struct {
 
 // SetupLogger is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupLogger(project interface{}) *MockProjectHelper_SetupLogger_Call {
+func (_e *MockProjectHelper_Expecter) SetupLogger(project any) *MockProjectHelper_SetupLogger_Call {
 	return &MockProjectHelper_SetupLogger_Call{Call: _e.mock.On("SetupLogger", project)}
 }
 
@@ -468,7 +477,7 @@ type MockProjectHelper_SetupModel_Call struct {
 
 // SetupModel is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupModel(project interface{}) *MockProjectHelper_SetupModel_Call {
+func (_e *MockProjectHelper_Expecter) SetupModel(project any) *MockProjectHelper_SetupModel_Call {
 	return &MockProjectHelper_SetupModel_Call{Call: _e.mock.On("SetupModel", project)}
 }
 
@@ -519,7 +528,7 @@ type MockProjectHelper_SetupProfiler_Call struct {
 
 // SetupProfiler is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupProfiler(project interface{}) *MockProjectHelper_SetupProfiler_Call {
+func (_e *MockProjectHelper_Expecter) SetupProfiler(project any) *MockProjectHelper_SetupProfiler_Call {
 	return &MockProjectHelper_SetupProfiler_Call{Call: _e.mock.On("SetupProfiler", project)}
 }
 
@@ -570,7 +579,7 @@ type MockProjectHelper_SetupRepository_Call struct {
 
 // SetupRepository is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupRepository(project interface{}) *MockProjectHelper_SetupRepository_Call {
+func (_e *MockProjectHelper_Expecter) SetupRepository(project any) *MockProjectHelper_SetupRepository_Call {
 	return &MockProjectHelper_SetupRepository_Call{Call: _e.mock.On("SetupRepository", project)}
 }
 
@@ -621,7 +630,7 @@ type MockProjectHelper_SetupService_Call struct {
 
 // SetupService is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupService(project interface{}) *MockProjectHelper_SetupService_Call {
+func (_e *MockProjectHelper_Expecter) SetupService(project any) *MockProjectHelper_SetupService_Call {
 	return &MockProjectHelper_SetupService_Call{Call: _e.mock.On("SetupService", project)}
 }
 
@@ -672,7 +681,7 @@ type MockProjectHelper_SetupUtils_Call struct {
 
 // SetupUtils is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectHelper_Expecter) SetupUtils(project interface{}) *MockProjectHelper_SetupUtils_Call {
+func (_e *MockProjectHelper_Expecter) SetupUtils(project any) *MockProjectHelper_SetupUtils_Call {
 	return &MockProjectHelper_SetupUtils_Call{Call: _e.mock.On("SetupUtils", project)}
 }
 

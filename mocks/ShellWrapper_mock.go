@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package wrappers
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -14,10 +14,19 @@ func NewMockShellWrapper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockShellWrapper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockShellWrapper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -77,9 +86,9 @@ type MockShellWrapper_Exec_Call struct {
 // Exec is a helper method to define mock.On call
 //   - name string
 //   - args ...string
-func (_e *MockShellWrapper_Expecter) Exec(name interface{}, args ...interface{}) *MockShellWrapper_Exec_Call {
+func (_e *MockShellWrapper_Expecter) Exec(name any, args ...any) *MockShellWrapper_Exec_Call {
 	return &MockShellWrapper_Exec_Call{Call: _e.mock.On("Exec",
-		append([]interface{}{name}, args...)...)}
+		append([]any{name}, args...)...)}
 }
 
 func (_c *MockShellWrapper_Exec_Call) Run(run func(name string, args ...string)) *MockShellWrapper_Exec_Call {

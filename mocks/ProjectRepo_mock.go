@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package repository
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -15,10 +15,19 @@ func NewMockProjectRepo(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockProjectRepo {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockProjectRepo{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -60,7 +69,7 @@ type MockProjectRepo_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - project models.Project
-func (_e *MockProjectRepo_Expecter) Create(project interface{}) *MockProjectRepo_Create_Call {
+func (_e *MockProjectRepo_Expecter) Create(project any) *MockProjectRepo_Create_Call {
 	return &MockProjectRepo_Create_Call{Call: _e.mock.On("Create", project)}
 }
 

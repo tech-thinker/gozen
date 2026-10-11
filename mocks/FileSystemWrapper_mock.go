@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package wrappers
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -14,10 +14,19 @@ func NewMockFileSystemWrapper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockFileSystemWrapper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockFileSystemWrapper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -59,7 +68,7 @@ type MockFileSystemWrapper_CreateDirectory_Call struct {
 
 // CreateDirectory is a helper method to define mock.On call
 //   - path string
-func (_e *MockFileSystemWrapper_Expecter) CreateDirectory(path interface{}) *MockFileSystemWrapper_CreateDirectory_Call {
+func (_e *MockFileSystemWrapper_Expecter) CreateDirectory(path any) *MockFileSystemWrapper_CreateDirectory_Call {
 	return &MockFileSystemWrapper_CreateDirectory_Call{Call: _e.mock.On("CreateDirectory", path)}
 }
 
@@ -110,7 +119,7 @@ type MockFileSystemWrapper_Destroy_Call struct {
 
 // Destroy is a helper method to define mock.On call
 //   - path string
-func (_e *MockFileSystemWrapper_Expecter) Destroy(path interface{}) *MockFileSystemWrapper_Destroy_Call {
+func (_e *MockFileSystemWrapper_Expecter) Destroy(path any) *MockFileSystemWrapper_Destroy_Call {
 	return &MockFileSystemWrapper_Destroy_Call{Call: _e.mock.On("Destroy", path)}
 }
 
@@ -162,7 +171,7 @@ type MockFileSystemWrapper_WriteFile_Call struct {
 // WriteFile is a helper method to define mock.On call
 //   - path string
 //   - data string
-func (_e *MockFileSystemWrapper_Expecter) WriteFile(path interface{}, data interface{}) *MockFileSystemWrapper_WriteFile_Call {
+func (_e *MockFileSystemWrapper_Expecter) WriteFile(path any, data any) *MockFileSystemWrapper_WriteFile_Call {
 	return &MockFileSystemWrapper_WriteFile_Call{Call: _e.mock.On("WriteFile", path, data)}
 }
 

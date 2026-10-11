@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package helpers
+package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
@@ -15,10 +15,19 @@ func NewMockCodeHelper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockCodeHelper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockCodeHelper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -60,7 +69,7 @@ type MockCodeHelper_GenerateModel_Call struct {
 
 // GenerateModel is a helper method to define mock.On call
 //   - doc models.Generator
-func (_e *MockCodeHelper_Expecter) GenerateModel(doc interface{}) *MockCodeHelper_GenerateModel_Call {
+func (_e *MockCodeHelper_Expecter) GenerateModel(doc any) *MockCodeHelper_GenerateModel_Call {
 	return &MockCodeHelper_GenerateModel_Call{Call: _e.mock.On("GenerateModel", doc)}
 }
 

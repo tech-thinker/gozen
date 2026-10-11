@@ -82,6 +82,14 @@ func Test_fileSystemWrapper_WriteFile(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "create file in invalid path should fail",
+			args: args{
+				path: "/invalid/path/that/does/not/exist/test.txt",
+				data: "sample data",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
